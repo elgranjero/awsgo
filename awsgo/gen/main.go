@@ -823,6 +823,7 @@ func renderDispatcherMain(services []serviceMeta) []byte {
 	b.WriteString("\t\"os/exec\"\n")
 	b.WriteString("\t\"path/filepath\"\n")
 	b.WriteString("\t\"runtime\"\n")
+	b.WriteString("\t\"strings\"\n")
 	b.WriteString(")\n\n")
 
 	b.WriteString("var serviceNames = []string{\n")
@@ -853,6 +854,10 @@ func renderDispatcherMain(services []serviceMeta) []byte {
 	if !ok {
 		fmt.Fprintf(os.Stderr, "unknown service %q\n", service)
 		os.Exit(2)
+	}
+	if !serviceEnabled(service) {
+		fmt.Fprintf(os.Stderr, "service %q is not part of this split build\n", service)
+		os.Exit(127)
 	}
 
 	forwarded := args[1:]
@@ -889,9 +894,80 @@ func printRootHelp() {
 	fmt.Println("  awsgo <service> <operation> [flags]")
 	fmt.Println()
 	fmt.Println("Available Services:")
-	for _, name := range serviceNames {
+	names := enabledServiceNames()
+	if len(names) == 0 {
+		fmt.Println("  (none found; run make build-split)")
+		return
+	}
+	for _, name := range names {
 		fmt.Printf("  %s\n", name)
 	}
+}
+
+func serviceEnabled(service string) bool {
+	if names, ok := manifestServices(); ok {
+		for _, name := range names {
+			if name == service {
+				return true
+			}
+		}
+		return false
+	}
+	_, err := findServiceBinary(service)
+	return err == nil
+}
+
+func enabledServiceNames() []string {
+	if names, ok := manifestServices(); ok {
+		return names
+	}
+	names := make([]string, 0, len(serviceNames))
+	for _, name := range serviceNames {
+		if _, err := findServiceBinary(name); err == nil {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+func manifestServices() ([]string, bool) {
+	for _, path := range serviceManifestPaths() {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			continue
+		}
+		out := make([]string, 0)
+		seen := map[string]bool{}
+		for _, raw := range strings.Split(string(data), "\n") {
+			name := strings.TrimSpace(raw)
+			if name == "" || strings.HasPrefix(name, "#") {
+				continue
+			}
+			if _, ok := serviceOps[name]; !ok || seen[name] {
+				continue
+			}
+			seen[name] = true
+			out = append(out, name)
+		}
+		return out, true
+	}
+	return nil, false
+}
+
+func serviceManifestPaths() []string {
+	paths := []string{}
+	if dir := os.Getenv("AWSGO_SERVICE_DIR"); dir != "" {
+		paths = append(paths, filepath.Join(dir, "manifest.txt"))
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return paths
+	}
+	dir := filepath.Dir(exe)
+	return append(paths,
+		filepath.Join(dir, "awsgo-services", "manifest.txt"),
+		filepath.Join(dir, "manifest.txt"),
+	)
 }
 
 func findServiceBinary(service string) (string, error) {

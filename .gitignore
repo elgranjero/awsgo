@@ -1,5 +1,6 @@
 .gocache/
 .gomodcache/
 bin/
+benchmarks/
 *.test
 .DS_Store
