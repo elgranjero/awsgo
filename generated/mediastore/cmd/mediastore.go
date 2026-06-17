@@ -14,6 +14,7 @@ var _mediastoreCmd = &cobra.Command{
 	Use:   "mediastore",
 	Short: "AWS mediastore CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -658,10 +659,10 @@ func init() {
 	_rootCmd.AddCommand(_mediastoreCmd)
 	_mediastoreCmd.Flags().SortFlags = false
 
-	_mediastoreCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_mediastoreCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_mediastoreCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_mediastoreCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_mediastoreCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_mediastoreCmd.Flags().StringVarP(&_mediastoreContainerName, "container-name", "", "", "Container Name")
 	_mediastoreCmd.Flags().StringVarP(&_mediastoreCorsPolicy, "cors-policy", "", "", "Cors Policy")

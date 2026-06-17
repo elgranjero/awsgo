@@ -14,6 +14,7 @@ var _chimesdkmediapipelinesCmd = &cobra.Command{
 	Use:   "chimesdkmediapipelines",
 	Short: "AWS chimesdkmediapipelines CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1151,10 +1152,10 @@ func init() {
 	_rootCmd.AddCommand(_chimesdkmediapipelinesCmd)
 	_chimesdkmediapipelinesCmd.Flags().SortFlags = false
 
-	_chimesdkmediapipelinesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_chimesdkmediapipelinesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_chimesdkmediapipelinesCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_chimesdkmediapipelinesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_chimesdkmediapipelinesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_chimesdkmediapipelinesCmd.Flags().StringVarP(&_chimesdkmediapipelinesChimeSdkMeetingConfiguration, "chime-sdk-meeting-configuration", "", "", "Chime Sdk Meeting Configuration")
 	_chimesdkmediapipelinesCmd.Flags().StringVarP(&_chimesdkmediapipelinesClientRequestToken, "client-request-token", "", "", "Client Request Token")

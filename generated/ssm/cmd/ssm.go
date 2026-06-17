@@ -14,6 +14,7 @@ var _ssmCmd = &cobra.Command{
 	Use:   "ssm",
 	Short: "AWS ssm CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -7414,10 +7415,10 @@ func init() {
 	_rootCmd.AddCommand(_ssmCmd)
 	_ssmCmd.Flags().SortFlags = false
 
-	_ssmCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ssmCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ssmCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ssmCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ssmCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ssmCmd.Flags().StringVarP(&_ssmAccessRequestId, "access-request-id", "", "", "Access Request ID")
 	_ssmCmd.Flags().StringVarP(&_ssmAccountId, "account-id", "", "", "Account ID")

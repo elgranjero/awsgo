@@ -14,6 +14,7 @@ var _sqsCmd = &cobra.Command{
 	Use:   "sqs",
 	Short: "AWS sqs CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1226,10 +1227,10 @@ func init() {
 	_rootCmd.AddCommand(_sqsCmd)
 	_sqsCmd.Flags().SortFlags = false
 
-	_sqsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_sqsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_sqsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_sqsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_sqsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_sqsCmd.Flags().StringSliceVarP(&_sqsActions, "actions", "", nil, "Actions")
 	_sqsCmd.Flags().StringVarP(&_sqsAttributeNames, "attribute-names", "", "", "Attribute Names")

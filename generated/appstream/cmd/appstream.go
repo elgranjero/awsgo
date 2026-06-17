@@ -14,6 +14,7 @@ var _appstreamCmd = &cobra.Command{
 	Use:   "appstream",
 	Short: "AWS appstream CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3594,10 +3595,10 @@ func init() {
 	_rootCmd.AddCommand(_appstreamCmd)
 	_appstreamCmd.Flags().SortFlags = false
 
-	_appstreamCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_appstreamCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_appstreamCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_appstreamCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_appstreamCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_appstreamCmd.Flags().StringVarP(&_appstreamAccessEndpoints, "access-endpoints", "", "", "Access Endpoints")
 	_appstreamCmd.Flags().StringVarP(&_appstreamAgentSoftwareVersion, "agent-software-version", "", "", "Agent Software Version")

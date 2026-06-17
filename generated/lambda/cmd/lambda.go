@@ -14,6 +14,7 @@ var _lambdaCmd = &cobra.Command{
 	Use:   "lambda",
 	Short: "AWS lambda CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -4245,10 +4246,10 @@ func init() {
 	_rootCmd.AddCommand(_lambdaCmd)
 	_lambdaCmd.Flags().SortFlags = false
 
-	_lambdaCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_lambdaCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_lambdaCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_lambdaCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_lambdaCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_lambdaCmd.Flags().StringVarP(&_lambdaAction, "action", "", "", "Action")
 	_lambdaCmd.Flags().StringVarP(&_lambdaAllowedPublishers, "allowed-publishers", "", "", "Allowed Publishers")

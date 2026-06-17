@@ -14,6 +14,7 @@ var _freetierCmd = &cobra.Command{
 	Use:   "freetier",
 	Short: "AWS freetier CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -218,10 +219,10 @@ func init() {
 	_rootCmd.AddCommand(_freetierCmd)
 	_freetierCmd.Flags().SortFlags = false
 
-	_freetierCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_freetierCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_freetierCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_freetierCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_freetierCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_freetierCmd.Flags().StringVarP(&_freetierAccountPlanType, "account-plan-type", "", "", "Account Plan Type")
 	_freetierCmd.Flags().StringVarP(&_freetierActivityId, "activity-id", "", "", "Activity ID")

@@ -14,6 +14,7 @@ var _eksauthCmd = &cobra.Command{
 	Use:   "eksauth",
 	Short: "AWS eksauth CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -70,10 +71,10 @@ func init() {
 	_rootCmd.AddCommand(_eksauthCmd)
 	_eksauthCmd.Flags().SortFlags = false
 
-	_eksauthCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_eksauthCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_eksauthCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_eksauthCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_eksauthCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_eksauthCmd.Flags().StringVarP(&_eksauthClusterName, "cluster-name", "", "", "Cluster Name")
 	_eksauthCmd.Flags().StringVarP(&_eksauthToken, "token", "", "", "Token")

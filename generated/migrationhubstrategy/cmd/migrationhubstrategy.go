@@ -14,6 +14,7 @@ var _migrationhubstrategyCmd = &cobra.Command{
 	Use:   "migrationhubstrategy",
 	Short: "AWS migrationhubstrategy CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -825,10 +826,10 @@ func init() {
 	_rootCmd.AddCommand(_migrationhubstrategyCmd)
 	_migrationhubstrategyCmd.Flags().SortFlags = false
 
-	_migrationhubstrategyCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_migrationhubstrategyCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_migrationhubstrategyCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_migrationhubstrategyCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_migrationhubstrategyCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_migrationhubstrategyCmd.Flags().StringVarP(&_migrationhubstrategyAppType, "app-type", "", "", "App Type")
 	_migrationhubstrategyCmd.Flags().StringVarP(&_migrationhubstrategyApplicationComponentCriteria, "application-component-criteria", "", "", "Application Component Criteria")

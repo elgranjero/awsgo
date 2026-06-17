@@ -14,6 +14,7 @@ var _chimesdkmessagingCmd = &cobra.Command{
 	Use:   "chimesdkmessaging",
 	Short: "AWS chimesdkmessaging CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2303,10 +2304,10 @@ func init() {
 	_rootCmd.AddCommand(_chimesdkmessagingCmd)
 	_chimesdkmessagingCmd.Flags().SortFlags = false
 
-	_chimesdkmessagingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_chimesdkmessagingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_chimesdkmessagingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_chimesdkmessagingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_chimesdkmessagingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_chimesdkmessagingCmd.Flags().StringVarP(&_chimesdkmessagingAppInstanceArn, "app-instance-arn", "", "", "App Instance ARN")
 	_chimesdkmessagingCmd.Flags().StringVarP(&_chimesdkmessagingAppInstanceUserArn, "app-instance-user-arn", "", "", "App Instance User ARN")

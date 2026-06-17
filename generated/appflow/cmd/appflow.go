@@ -14,6 +14,7 @@ var _appflowCmd = &cobra.Command{
 	Use:   "appflow",
 	Short: "AWS appflow CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1077,10 +1078,10 @@ func init() {
 	_rootCmd.AddCommand(_appflowCmd)
 	_appflowCmd.Flags().SortFlags = false
 
-	_appflowCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_appflowCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_appflowCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_appflowCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_appflowCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_appflowCmd.Flags().StringVarP(&_appflowApiVersion, "api-version", "", "", "API Version")
 	_appflowCmd.Flags().StringVarP(&_appflowClientToken, "client-token", "", "", "Client Token")

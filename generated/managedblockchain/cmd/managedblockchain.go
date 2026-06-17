@@ -14,6 +14,7 @@ var _managedblockchainCmd = &cobra.Command{
 	Use:   "managedblockchain",
 	Short: "AWS managedblockchain CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1165,10 +1166,10 @@ func init() {
 	_rootCmd.AddCommand(_managedblockchainCmd)
 	_managedblockchainCmd.Flags().SortFlags = false
 
-	_managedblockchainCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_managedblockchainCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_managedblockchainCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_managedblockchainCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_managedblockchainCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_managedblockchainCmd.Flags().StringVarP(&_managedblockchainAccessorId, "accessor-id", "", "", "Accessor ID")
 	_managedblockchainCmd.Flags().StringVarP(&_managedblockchainAccessorType, "accessor-type", "", "", "Accessor Type")

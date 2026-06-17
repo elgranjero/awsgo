@@ -14,6 +14,7 @@ var _codebuildCmd = &cobra.Command{
 	Use:   "codebuild",
 	Short: "AWS codebuild CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2887,10 +2888,10 @@ func init() {
 	_rootCmd.AddCommand(_codebuildCmd)
 	_codebuildCmd.Flags().SortFlags = false
 
-	_codebuildCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_codebuildCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_codebuildCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_codebuildCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_codebuildCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_codebuildCmd.Flags().StringVarP(&_codebuildArn, "arn", "", "", "ARN")
 	_codebuildCmd.Flags().StringVarP(&_codebuildArtifacts, "artifacts", "", "", "Artifacts")

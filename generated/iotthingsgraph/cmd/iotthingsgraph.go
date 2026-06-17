@@ -14,6 +14,7 @@ var _iotthingsgraphCmd = &cobra.Command{
 	Use:   "iotthingsgraph",
 	Short: "AWS iotthingsgraph CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1445,10 +1446,10 @@ func init() {
 	_rootCmd.AddCommand(_iotthingsgraphCmd)
 	_iotthingsgraphCmd.Flags().SortFlags = false
 
-	_iotthingsgraphCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_iotthingsgraphCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_iotthingsgraphCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_iotthingsgraphCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_iotthingsgraphCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_iotthingsgraphCmd.Flags().StringVarP(&_iotthingsgraphCompatibleNamespaceVersion, "compatible-namespace-version", "", "", "Compatible Namespace Version")
 	_iotthingsgraphCmd.Flags().StringVarP(&_iotthingsgraphDefinition, "definition", "", "", "Definition")

@@ -14,6 +14,7 @@ var _networkfirewallCmd = &cobra.Command{
 	Use:   "networkfirewall",
 	Short: "AWS networkfirewall CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3379,10 +3380,10 @@ func init() {
 	_rootCmd.AddCommand(_networkfirewallCmd)
 	_networkfirewallCmd.Flags().SortFlags = false
 
-	_networkfirewallCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_networkfirewallCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_networkfirewallCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_networkfirewallCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_networkfirewallCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_networkfirewallCmd.Flags().StringVarP(&_networkfirewallAction, "action", "", "", "Action")
 	_networkfirewallCmd.Flags().StringVarP(&_networkfirewallAddConditions, "add-conditions", "", "", "Add Conditions")

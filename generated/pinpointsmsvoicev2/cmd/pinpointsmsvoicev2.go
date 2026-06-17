@@ -14,6 +14,7 @@ var _pinpointsmsvoicev2Cmd = &cobra.Command{
 	Use:   "pinpointsmsvoicev2",
 	Short: "AWS pinpointsmsvoicev2 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3835,10 +3836,10 @@ func init() {
 	_rootCmd.AddCommand(_pinpointsmsvoicev2Cmd)
 	_pinpointsmsvoicev2Cmd.Flags().SortFlags = false
 
-	_pinpointsmsvoicev2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_pinpointsmsvoicev2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_pinpointsmsvoicev2Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_pinpointsmsvoicev2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_pinpointsmsvoicev2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_pinpointsmsvoicev2Cmd.Flags().StringVarP(&_pinpointsmsvoicev2Action, "action", "", "", "Action")
 	_pinpointsmsvoicev2Cmd.Flags().StringVarP(&_pinpointsmsvoicev2AttachmentBody, "attachment-body", "", "", "Attachment Body")

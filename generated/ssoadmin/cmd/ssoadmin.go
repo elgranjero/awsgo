@@ -14,6 +14,7 @@ var _ssoadminCmd = &cobra.Command{
 	Use:   "ssoadmin",
 	Short: "AWS ssoadmin CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3191,10 +3192,10 @@ func init() {
 	_rootCmd.AddCommand(_ssoadminCmd)
 	_ssoadminCmd.Flags().SortFlags = false
 
-	_ssoadminCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ssoadminCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ssoadminCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ssoadminCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ssoadminCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ssoadminCmd.Flags().StringVarP(&_ssoadminAccountAssignmentCreationRequestId, "account-assignment-creation-request-id", "", "", "Account Assignment Creation Request ID")
 	_ssoadminCmd.Flags().StringVarP(&_ssoadminAccountAssignmentDeletionRequestId, "account-assignment-deletion-request-id", "", "", "Account Assignment Deletion Request ID")

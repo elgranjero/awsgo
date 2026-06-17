@@ -14,6 +14,7 @@ var _mediaconvertCmd = &cobra.Command{
 	Use:   "mediaconvert",
 	Short: "AWS mediaconvert CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1365,10 +1366,10 @@ func init() {
 	_rootCmd.AddCommand(_mediaconvertCmd)
 	_mediaconvertCmd.Flags().SortFlags = false
 
-	_mediaconvertCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_mediaconvertCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_mediaconvertCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_mediaconvertCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_mediaconvertCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_mediaconvertCmd.Flags().StringVarP(&_mediaconvertAccelerationSettings, "acceleration-settings", "", "", "Acceleration Settings")
 	_mediaconvertCmd.Flags().StringVarP(&_mediaconvertArn, "arn", "", "", "ARN")

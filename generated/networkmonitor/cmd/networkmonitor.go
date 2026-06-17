@@ -14,6 +14,7 @@ var _networkmonitorCmd = &cobra.Command{
 	Use:   "networkmonitor",
 	Short: "AWS networkmonitor CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -501,10 +502,10 @@ func init() {
 	_rootCmd.AddCommand(_networkmonitorCmd)
 	_networkmonitorCmd.Flags().SortFlags = false
 
-	_networkmonitorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_networkmonitorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_networkmonitorCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_networkmonitorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_networkmonitorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_networkmonitorCmd.Flags().StringVarP(&_networkmonitorAggregationPeriod, "aggregation-period", "", "", "Aggregation Period")
 	_networkmonitorCmd.Flags().StringVarP(&_networkmonitorClientToken, "client-token", "", "", "Client Token")

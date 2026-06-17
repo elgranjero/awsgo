@@ -14,6 +14,7 @@ var _customerprofilesCmd = &cobra.Command{
 	Use:   "customerprofiles",
 	Short: "AWS customerprofiles CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -4204,10 +4205,10 @@ func init() {
 	_rootCmd.AddCommand(_customerprofilesCmd)
 	_customerprofilesCmd.Flags().SortFlags = false
 
-	_customerprofilesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_customerprofilesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_customerprofilesCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_customerprofilesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_customerprofilesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_customerprofilesCmd.Flags().StringVarP(&_customerprofilesAccountNumber, "account-number", "", "", "Account Number")
 	_customerprofilesCmd.Flags().StringVarP(&_customerprofilesActionType, "action-type", "", "", "Action Type")

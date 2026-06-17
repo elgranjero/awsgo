@@ -14,6 +14,7 @@ var _managedblockchainqueryCmd = &cobra.Command{
 	Use:   "managedblockchainquery",
 	Short: "AWS managedblockchainquery CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -528,10 +529,10 @@ func init() {
 	_rootCmd.AddCommand(_managedblockchainqueryCmd)
 	_managedblockchainqueryCmd.Flags().SortFlags = false
 
-	_managedblockchainqueryCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_managedblockchainqueryCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_managedblockchainqueryCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_managedblockchainqueryCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_managedblockchainqueryCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_managedblockchainqueryCmd.Flags().StringVarP(&_managedblockchainqueryAddress, "address", "", "", "Address")
 	_managedblockchainqueryCmd.Flags().StringVarP(&_managedblockchainqueryAddressIdentifierFilter, "address-identifier-filter", "", "", "Address Identifier Filter")

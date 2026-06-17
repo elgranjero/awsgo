@@ -14,6 +14,7 @@ var _marketplacedeploymentCmd = &cobra.Command{
 	Use:   "marketplacedeployment",
 	Short: "AWS marketplacedeployment CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -177,10 +178,10 @@ func init() {
 	_rootCmd.AddCommand(_marketplacedeploymentCmd)
 	_marketplacedeploymentCmd.Flags().SortFlags = false
 
-	_marketplacedeploymentCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_marketplacedeploymentCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_marketplacedeploymentCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_marketplacedeploymentCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_marketplacedeploymentCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_marketplacedeploymentCmd.Flags().StringVarP(&_marketplacedeploymentAgreementId, "agreement-id", "", "", "Agreement ID")
 	_marketplacedeploymentCmd.Flags().StringVarP(&_marketplacedeploymentCatalog, "catalog", "", "", "Catalog")

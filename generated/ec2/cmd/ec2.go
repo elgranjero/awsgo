@@ -14,6 +14,7 @@ var _ec2Cmd = &cobra.Command{
 	Use:   "ec2",
 	Short: "AWS ec2 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -39341,10 +39342,10 @@ func init() {
 	_rootCmd.AddCommand(_ec2Cmd)
 	_ec2Cmd.Flags().SortFlags = false
 
-	_ec2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ec2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ec2Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ec2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ec2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ec2Cmd.Flags().StringVarP(&_ec2Accept, "accept", "", "", "Accept")
 	_ec2Cmd.Flags().StringVarP(&_ec2AcceptanceRequired, "acceptance-required", "", "", "Acceptance Required")

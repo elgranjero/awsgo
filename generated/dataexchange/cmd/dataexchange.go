@@ -14,6 +14,7 @@ var _dataexchangeCmd = &cobra.Command{
 	Use:   "dataexchange",
 	Short: "AWS dataexchange CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1309,10 +1310,10 @@ func init() {
 	_rootCmd.AddCommand(_dataexchangeCmd)
 	_dataexchangeCmd.Flags().SortFlags = false
 
-	_dataexchangeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_dataexchangeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_dataexchangeCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_dataexchangeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_dataexchangeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_dataexchangeCmd.Flags().StringVarP(&_dataexchangeAcceptanceState, "acceptance-state", "", "", "Acceptance State")
 	_dataexchangeCmd.Flags().StringVarP(&_dataexchangeAction, "action", "", "", "Action")

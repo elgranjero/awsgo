@@ -14,6 +14,7 @@ var _route53Cmd = &cobra.Command{
 	Use:   "route53",
 	Short: "AWS route53 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3254,10 +3255,10 @@ func init() {
 	_rootCmd.AddCommand(_route53Cmd)
 	_route53Cmd.Flags().SortFlags = false
 
-	_route53Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_route53Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_route53Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_route53Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_route53Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_route53Cmd.Flags().StringVarP(&_route53AddTags, "add-tags", "", "", "Add Tags")
 	_route53Cmd.Flags().StringVarP(&_route53AlarmIdentifier, "alarm-identifier", "", "", "Alarm Identifier")

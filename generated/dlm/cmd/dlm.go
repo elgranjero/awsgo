@@ -14,6 +14,7 @@ var _dlmCmd = &cobra.Command{
 	Use:   "dlm",
 	Short: "AWS dlm CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -420,10 +421,10 @@ func init() {
 	_rootCmd.AddCommand(_dlmCmd)
 	_dlmCmd.Flags().SortFlags = false
 
-	_dlmCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_dlmCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_dlmCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_dlmCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_dlmCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_dlmCmd.Flags().StringVarP(&_dlmCopyTags, "copy-tags", "", "", "Copy Tags")
 	_dlmCmd.Flags().StringVarP(&_dlmCreateInterval, "create-interval", "", "", "Create Interval")

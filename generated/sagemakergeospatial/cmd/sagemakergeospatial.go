@@ -14,6 +14,7 @@ var _sagemakergeospatialCmd = &cobra.Command{
 	Use:   "sagemakergeospatial",
 	Short: "AWS sagemakergeospatial CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -776,10 +777,10 @@ func init() {
 	_rootCmd.AddCommand(_sagemakergeospatialCmd)
 	_sagemakergeospatialCmd.Flags().SortFlags = false
 
-	_sagemakergeospatialCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_sagemakergeospatialCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_sagemakergeospatialCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_sagemakergeospatialCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_sagemakergeospatialCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_sagemakergeospatialCmd.Flags().StringVarP(&_sagemakergeospatialArn, "arn", "", "", "ARN")
 	_sagemakergeospatialCmd.Flags().StringVarP(&_sagemakergeospatialClientToken, "client-token", "", "", "Client Token")

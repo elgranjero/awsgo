@@ -14,6 +14,7 @@ var _amplifyuibuilderCmd = &cobra.Command{
 	Use:   "amplifyuibuilder",
 	Short: "AWS amplifyuibuilder CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1103,10 +1104,10 @@ func init() {
 	_rootCmd.AddCommand(_amplifyuibuilderCmd)
 	_amplifyuibuilderCmd.Flags().SortFlags = false
 
-	_amplifyuibuilderCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_amplifyuibuilderCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_amplifyuibuilderCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_amplifyuibuilderCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_amplifyuibuilderCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_amplifyuibuilderCmd.Flags().StringVarP(&_amplifyuibuilderAppId, "app-id", "", "", "App ID")
 	_amplifyuibuilderCmd.Flags().StringVarP(&_amplifyuibuilderBody, "body", "", "", "Body")

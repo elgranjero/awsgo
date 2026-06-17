@@ -14,6 +14,7 @@ var _applicationdiscoveryserviceCmd = &cobra.Command{
 	Use:   "applicationdiscoveryservice",
 	Short: "AWS applicationdiscoveryservice CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1105,10 +1106,10 @@ func init() {
 	_rootCmd.AddCommand(_applicationdiscoveryserviceCmd)
 	_applicationdiscoveryserviceCmd.Flags().SortFlags = false
 
-	_applicationdiscoveryserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_applicationdiscoveryserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_applicationdiscoveryserviceCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_applicationdiscoveryserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_applicationdiscoveryserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_applicationdiscoveryserviceCmd.Flags().StringSliceVarP(&_applicationdiscoveryserviceAgentIds, "agent-ids", "", nil, "Agent Ids")
 	_applicationdiscoveryserviceCmd.Flags().StringVarP(&_applicationdiscoveryserviceApplicationConfigurationId, "application-configuration-id", "", "", "Application Configuration ID")

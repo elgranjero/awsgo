@@ -14,6 +14,7 @@ var _chimesdkmeetingsCmd = &cobra.Command{
 	Use:   "chimesdkmeetings",
 	Short: "AWS chimesdkmeetings CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -797,10 +798,10 @@ func init() {
 	_rootCmd.AddCommand(_chimesdkmeetingsCmd)
 	_chimesdkmeetingsCmd.Flags().SortFlags = false
 
-	_chimesdkmeetingsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_chimesdkmeetingsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_chimesdkmeetingsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_chimesdkmeetingsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_chimesdkmeetingsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_chimesdkmeetingsCmd.Flags().StringVarP(&_chimesdkmeetingsAttendeeId, "attendee-id", "", "", "Attendee ID")
 	_chimesdkmeetingsCmd.Flags().StringVarP(&_chimesdkmeetingsAttendees, "attendees", "", "", "Attendees")

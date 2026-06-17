@@ -14,6 +14,7 @@ var _mturkCmd = &cobra.Command{
 	Use:   "mturk",
 	Short: "AWS mturk CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1891,10 +1892,10 @@ func init() {
 	_rootCmd.AddCommand(_mturkCmd)
 	_mturkCmd.Flags().SortFlags = false
 
-	_mturkCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_mturkCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_mturkCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_mturkCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_mturkCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_mturkCmd.Flags().StringVarP(&_mturkActive, "active", "", "", "Active")
 	_mturkCmd.Flags().StringVarP(&_mturkAnswerKey, "answer-key", "", "", "Answer Key")

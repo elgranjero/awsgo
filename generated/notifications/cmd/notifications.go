@@ -14,6 +14,7 @@ var _notificationsCmd = &cobra.Command{
 	Use:   "notifications",
 	Short: "AWS notifications CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1489,10 +1490,10 @@ func init() {
 	_rootCmd.AddCommand(_notificationsCmd)
 	_notificationsCmd.Flags().SortFlags = false
 
-	_notificationsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_notificationsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_notificationsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_notificationsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_notificationsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_notificationsCmd.Flags().StringVarP(&_notificationsAggregateManagedNotificationEventArn, "aggregate-managed-notification-event-arn", "", "", "Aggregate Managed Notification Event ARN")
 	_notificationsCmd.Flags().StringVarP(&_notificationsAggregateNotificationEventArn, "aggregate-notification-event-arn", "", "", "Aggregate Notification Event ARN")

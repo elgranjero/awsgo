@@ -14,6 +14,7 @@ var _medicalimagingCmd = &cobra.Command{
 	Use:   "medicalimaging",
 	Short: "AWS medicalimaging CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -738,10 +739,10 @@ func init() {
 	_rootCmd.AddCommand(_medicalimagingCmd)
 	_medicalimagingCmd.Flags().SortFlags = false
 
-	_medicalimagingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_medicalimagingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_medicalimagingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_medicalimagingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_medicalimagingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_medicalimagingCmd.Flags().StringVarP(&_medicalimagingClientToken, "client-token", "", "", "Client Token")
 	_medicalimagingCmd.Flags().StringVarP(&_medicalimagingCopyImageSetInformation, "copy-image-set-information", "", "", "Copy Image Set Information")

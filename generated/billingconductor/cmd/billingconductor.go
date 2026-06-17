@@ -14,6 +14,7 @@ var _billingconductorCmd = &cobra.Command{
 	Use:   "billingconductor",
 	Short: "AWS billingconductor CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1415,10 +1416,10 @@ func init() {
 	_rootCmd.AddCommand(_billingconductorCmd)
 	_billingconductorCmd.Flags().SortFlags = false
 
-	_billingconductorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_billingconductorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_billingconductorCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_billingconductorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_billingconductorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_billingconductorCmd.Flags().StringVarP(&_billingconductorAccountGrouping, "account-grouping", "", "", "Account Grouping")
 	_billingconductorCmd.Flags().StringVarP(&_billingconductorAccountId, "account-id", "", "", "Account ID")

@@ -14,6 +14,7 @@ var _emrCmd = &cobra.Command{
 	Use:   "emr",
 	Short: "AWS emr CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2597,10 +2598,10 @@ func init() {
 	_rootCmd.AddCommand(_emrCmd)
 	_emrCmd.Flags().SortFlags = false
 
-	_emrCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_emrCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_emrCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_emrCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_emrCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_emrCmd.Flags().StringVarP(&_emrAdditionalInfo, "additional-info", "", "", "Additional Info")
 	_emrCmd.Flags().StringVarP(&_emrAmiVersion, "ami-version", "", "", "AMI Version")

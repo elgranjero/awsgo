@@ -14,6 +14,7 @@ var _partnercentralaccountCmd = &cobra.Command{
 	Use:   "partnercentralaccount",
 	Short: "AWS partnercentralaccount CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1088,10 +1089,10 @@ func init() {
 	_rootCmd.AddCommand(_partnercentralaccountCmd)
 	_partnercentralaccountCmd.Flags().SortFlags = false
 
-	_partnercentralaccountCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_partnercentralaccountCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_partnercentralaccountCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_partnercentralaccountCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_partnercentralaccountCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_partnercentralaccountCmd.Flags().StringVarP(&_partnercentralaccountAccessType, "access-type", "", "", "Access Type")
 	_partnercentralaccountCmd.Flags().StringVarP(&_partnercentralaccountAllianceLeadContact, "alliance-lead-contact", "", "", "Alliance Lead Contact")

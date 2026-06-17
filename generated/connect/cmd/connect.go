@@ -14,6 +14,7 @@ var _connectCmd = &cobra.Command{
 	Use:   "connect",
 	Short: "AWS connect CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -17177,10 +17178,10 @@ func init() {
 	_rootCmd.AddCommand(_connectCmd)
 	_connectCmd.Flags().SortFlags = false
 
-	_connectCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_connectCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_connectCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_connectCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_connectCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_connectCmd.Flags().StringVarP(&_connectActions, "actions", "", "", "Actions")
 	_connectCmd.Flags().StringVarP(&_connectAdditionalRecipients, "additional-recipients", "", "", "Additional Recipients")

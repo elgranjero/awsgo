@@ -14,6 +14,7 @@ var _odbCmd = &cobra.Command{
 	Use:   "odb",
 	Short: "AWS odb CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1808,10 +1809,10 @@ func init() {
 	_rootCmd.AddCommand(_odbCmd)
 	_odbCmd.Flags().SortFlags = false
 
-	_odbCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_odbCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_odbCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_odbCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_odbCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_odbCmd.Flags().StringVarP(&_odbAutonomousDataStorageSizeInTBs, "autonomous-data-storage-size-in-tbs", "", "", "Autonomous Data Storage Size In Tbs")
 	_odbCmd.Flags().StringVarP(&_odbAvailabilityZone, "availability-zone", "", "", "Availability Zone")

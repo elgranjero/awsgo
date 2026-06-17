@@ -14,6 +14,7 @@ var _applicationautoscalingCmd = &cobra.Command{
 	Use:   "applicationautoscaling",
 	Short: "AWS applicationautoscaling CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -936,10 +937,10 @@ func init() {
 	_rootCmd.AddCommand(_applicationautoscalingCmd)
 	_applicationautoscalingCmd.Flags().SortFlags = false
 
-	_applicationautoscalingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_applicationautoscalingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_applicationautoscalingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_applicationautoscalingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_applicationautoscalingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_applicationautoscalingCmd.Flags().StringVarP(&_applicationautoscalingEndTime, "end-time", "", "", "End Time")
 	_applicationautoscalingCmd.Flags().StringVarP(&_applicationautoscalingIncludeNotScaledActivities, "include-not-scaled-activities", "", "", "Include Not Scaled Activities")

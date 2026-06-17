@@ -14,6 +14,7 @@ var _arczonalshiftCmd = &cobra.Command{
 	Use:   "arczonalshift",
 	Short: "AWS arczonalshift CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -649,10 +650,10 @@ func init() {
 	_rootCmd.AddCommand(_arczonalshiftCmd)
 	_arczonalshiftCmd.Flags().SortFlags = false
 
-	_arczonalshiftCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_arczonalshiftCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_arczonalshiftCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_arczonalshiftCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_arczonalshiftCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_arczonalshiftCmd.Flags().StringSliceVarP(&_arczonalshiftAllowedWindows, "allowed-windows", "", nil, "Allowed Windows")
 	_arczonalshiftCmd.Flags().StringVarP(&_arczonalshiftAwayFrom, "away-from", "", "", "Away From")

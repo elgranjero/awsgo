@@ -14,6 +14,7 @@ var _codegurusecurityCmd = &cobra.Command{
 	Use:   "codegurusecurity",
 	Short: "AWS codegurusecurity CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -485,10 +486,10 @@ func init() {
 	_rootCmd.AddCommand(_codegurusecurityCmd)
 	_codegurusecurityCmd.Flags().SortFlags = false
 
-	_codegurusecurityCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_codegurusecurityCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_codegurusecurityCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_codegurusecurityCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_codegurusecurityCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_codegurusecurityCmd.Flags().StringVarP(&_codegurusecurityAnalysisType, "analysis-type", "", "", "Analysis Type")
 	_codegurusecurityCmd.Flags().StringVarP(&_codegurusecurityClientToken, "client-token", "", "", "Client Token")

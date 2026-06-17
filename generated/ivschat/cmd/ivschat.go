@@ -14,6 +14,7 @@ var _ivschatCmd = &cobra.Command{
 	Use:   "ivschat",
 	Short: "AWS ivschat CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -651,10 +652,10 @@ func init() {
 	_rootCmd.AddCommand(_ivschatCmd)
 	_ivschatCmd.Flags().SortFlags = false
 
-	_ivschatCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ivschatCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ivschatCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ivschatCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ivschatCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ivschatCmd.Flags().StringVarP(&_ivschatAttributes, "attributes", "", "", "Attributes")
 	_ivschatCmd.Flags().StringVarP(&_ivschatCapabilities, "capabilities", "", "", "Capabilities")

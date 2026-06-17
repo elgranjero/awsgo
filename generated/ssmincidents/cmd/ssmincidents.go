@@ -14,6 +14,7 @@ var _ssmincidentsCmd = &cobra.Command{
 	Use:   "ssmincidents",
 	Short: "AWS ssmincidents CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1270,10 +1271,10 @@ func init() {
 	_rootCmd.AddCommand(_ssmincidentsCmd)
 	_ssmincidentsCmd.Flags().SortFlags = false
 
-	_ssmincidentsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ssmincidentsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ssmincidentsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ssmincidentsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ssmincidentsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ssmincidentsCmd.Flags().StringVarP(&_ssmincidentsActions, "actions", "", "", "Actions")
 	_ssmincidentsCmd.Flags().StringVarP(&_ssmincidentsArn, "arn", "", "", "ARN")

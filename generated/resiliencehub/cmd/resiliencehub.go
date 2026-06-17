@@ -14,6 +14,7 @@ var _resiliencehubCmd = &cobra.Command{
 	Use:   "resiliencehub",
 	Short: "AWS resiliencehub CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2752,10 +2753,10 @@ func init() {
 	_rootCmd.AddCommand(_resiliencehubCmd)
 	_resiliencehubCmd.Flags().SortFlags = false
 
-	_resiliencehubCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_resiliencehubCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_resiliencehubCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_resiliencehubCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_resiliencehubCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_resiliencehubCmd.Flags().StringVarP(&_resiliencehubAdditionalInfo, "additional-info", "", "", "Additional Info")
 	_resiliencehubCmd.Flags().StringVarP(&_resiliencehubAppArn, "app-arn", "", "", "App ARN")

@@ -14,6 +14,7 @@ var _autoscalingCmd = &cobra.Command{
 	Use:   "autoscaling",
 	Short: "AWS autoscaling CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3546,10 +3547,10 @@ func init() {
 	_rootCmd.AddCommand(_autoscalingCmd)
 	_autoscalingCmd.Flags().SortFlags = false
 
-	_autoscalingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_autoscalingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_autoscalingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_autoscalingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_autoscalingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_autoscalingCmd.Flags().StringSliceVarP(&_autoscalingActivityIds, "activity-ids", "", nil, "Activity Ids")
 	_autoscalingCmd.Flags().StringVarP(&_autoscalingAdjustmentType, "adjustment-type", "", "", "Adjustment Type")

@@ -14,6 +14,7 @@ var _sesCmd = &cobra.Command{
 	Use:   "ses",
 	Short: "AWS ses CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2817,10 +2818,10 @@ func init() {
 	_rootCmd.AddCommand(_sesCmd)
 	_sesCmd.Flags().SortFlags = false
 
-	_sesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_sesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_sesCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_sesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_sesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_sesCmd.Flags().StringVarP(&_sesAfter, "after", "", "", "After")
 	_sesCmd.Flags().StringVarP(&_sesBehaviorOnMXFailure, "behavior-on-mx-failure", "", "", "Behavior On Mx Failure")

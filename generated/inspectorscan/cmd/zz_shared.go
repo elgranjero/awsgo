@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"html"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -29,6 +30,7 @@ var (
 
 func writeOutput(headers []string, rows [][]string, structured any, format string) {
 	var b bytes.Buffer
+	safeStructured := normalizeStructured(structured)
 	switch strings.ToLower(strings.TrimSpace(format)) {
 	case "md", "markdown":
 		writeMarkdown(&b, headers, rows)
@@ -39,19 +41,110 @@ func writeOutput(headers []string, rows [][]string, structured any, format strin
 	case "html":
 		writeHTML(&b, headers, rows)
 	case "text", "yaml":
-		data, _ := yaml.Marshal(structured)
+		data, err := yaml.Marshal(safeStructured)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
 		b.Write(data)
 	case "", "json":
-		data, _ := json.MarshalIndent(structured, "", "  ")
+		data, err := json.MarshalIndent(safeStructured, "", "  ")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
 		b.Write(data)
 	default:
-		data, _ := json.MarshalIndent(structured, "", "  ")
+		data, err := json.MarshalIndent(safeStructured, "", "  ")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
 		b.Write(data)
 	}
 	if b.Len() > 0 && b.Bytes()[b.Len()-1] != '\n' {
 		b.WriteByte('\n')
 	}
 	_, _ = os.Stdout.Write(b.Bytes())
+}
+
+func normalizeStructured(v any) any {
+	data, err := json.Marshal(v)
+	if err != nil {
+		return v
+	}
+	var out any
+	if err := json.Unmarshal(data, &out); err != nil {
+		return v
+	}
+	return out
+}
+
+func resolveAWSOutput(profile string, explicit bool) string {
+	if explicit {
+		if v := strings.TrimSpace(_awsOutput); v != "" {
+			return v
+		}
+	}
+	if v := strings.TrimSpace(os.Getenv("AWS_DEFAULT_OUTPUT")); v != "" {
+		return v
+	}
+	if v := sharedConfigProfileOutput(profile); v != "" {
+		return v
+	}
+	return "json"
+}
+
+func sharedConfigProfileOutput(profile string) string {
+	profile = strings.TrimSpace(profile)
+	if profile == "" {
+		profile = strings.TrimSpace(os.Getenv("AWS_PROFILE"))
+	}
+	if profile == "" {
+		profile = "default"
+	}
+
+	sectionName := "default"
+	if profile != "default" {
+		sectionName = "profile " + profile
+	}
+
+	configPath := strings.TrimSpace(os.Getenv("AWS_CONFIG_FILE"))
+	if configPath == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return ""
+		}
+		configPath = filepath.Join(home, ".aws", "config")
+	}
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return ""
+	}
+
+	currentSection := ""
+	for _, rawLine := range strings.Split(string(data), "\n") {
+		line := strings.TrimSpace(rawLine)
+		if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, ";") {
+			continue
+		}
+		if strings.HasPrefix(line, "[") {
+			if end := strings.Index(line, "]"); end >= 0 {
+				currentSection = strings.TrimSpace(line[1:end])
+			}
+			continue
+		}
+		if currentSection != sectionName {
+			continue
+		}
+		key, value, ok := strings.Cut(line, "=")
+		if !ok || strings.TrimSpace(key) != "output" {
+			continue
+		}
+		return strings.Trim(strings.TrimSpace(value), "\"'")
+	}
+	return ""
 }
 
 func writeCSV(out *bytes.Buffer, headers []string, rows [][]string) {

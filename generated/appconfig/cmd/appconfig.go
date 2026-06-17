@@ -14,6 +14,7 @@ var _appconfigCmd = &cobra.Command{
 	Use:   "appconfig",
 	Short: "AWS appconfig CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1884,10 +1885,10 @@ func init() {
 	_rootCmd.AddCommand(_appconfigCmd)
 	_appconfigCmd.Flags().SortFlags = false
 
-	_appconfigCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_appconfigCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_appconfigCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_appconfigCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_appconfigCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_appconfigCmd.Flags().StringVarP(&_appconfigActions, "actions", "", "", "Actions")
 	_appconfigCmd.Flags().StringVarP(&_appconfigAllowRevert, "allow-revert", "", "", "Allow Revert")

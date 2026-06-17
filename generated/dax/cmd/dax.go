@@ -14,6 +14,7 @@ var _daxCmd = &cobra.Command{
 	Use:   "dax",
 	Short: "AWS dax CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -805,10 +806,10 @@ func init() {
 	_rootCmd.AddCommand(_daxCmd)
 	_daxCmd.Flags().SortFlags = false
 
-	_daxCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_daxCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_daxCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_daxCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_daxCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_daxCmd.Flags().StringSliceVarP(&_daxAvailabilityZones, "availability-zones", "", nil, "Availability Zones")
 	_daxCmd.Flags().StringVarP(&_daxClusterEndpointEncryptionType, "cluster-endpoint-encryption-type", "", "", "Cluster Endpoint Encryption Type")

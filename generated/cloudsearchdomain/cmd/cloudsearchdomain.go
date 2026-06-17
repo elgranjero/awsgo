@@ -14,6 +14,7 @@ var _cloudsearchdomainCmd = &cobra.Command{
 	Use:   "cloudsearchdomain",
 	Short: "AWS cloudsearchdomain CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -252,10 +253,10 @@ func init() {
 	_rootCmd.AddCommand(_cloudsearchdomainCmd)
 	_cloudsearchdomainCmd.Flags().SortFlags = false
 
-	_cloudsearchdomainCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_cloudsearchdomainCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_cloudsearchdomainCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_cloudsearchdomainCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_cloudsearchdomainCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_cloudsearchdomainCmd.Flags().StringVarP(&_cloudsearchdomainContentType, "content-type", "", "", "Content Type")
 	_cloudsearchdomainCmd.Flags().StringVarP(&_cloudsearchdomainCursor, "cursor", "", "", "Cursor")

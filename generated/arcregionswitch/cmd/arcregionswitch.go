@@ -14,6 +14,7 @@ var _arcregionswitchCmd = &cobra.Command{
 	Use:   "arcregionswitch",
 	Short: "AWS arcregionswitch CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -986,10 +987,10 @@ func init() {
 	_rootCmd.AddCommand(_arcregionswitchCmd)
 	_arcregionswitchCmd.Flags().SortFlags = false
 
-	_arcregionswitchCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_arcregionswitchCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_arcregionswitchCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_arcregionswitchCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_arcregionswitchCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_arcregionswitchCmd.Flags().StringVarP(&_arcregionswitchAction, "action", "", "", "Action")
 	_arcregionswitchCmd.Flags().StringVarP(&_arcregionswitchActionToTake, "action-to-take", "", "", "Action To Take")

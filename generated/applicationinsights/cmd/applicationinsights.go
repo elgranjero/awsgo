@@ -14,6 +14,7 @@ var _applicationinsightsCmd = &cobra.Command{
 	Use:   "applicationinsights",
 	Short: "AWS applicationinsights CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1380,10 +1381,10 @@ func init() {
 	_rootCmd.AddCommand(_applicationinsightsCmd)
 	_applicationinsightsCmd.Flags().SortFlags = false
 
-	_applicationinsightsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_applicationinsightsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_applicationinsightsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_applicationinsightsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_applicationinsightsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_applicationinsightsCmd.Flags().StringVarP(&_applicationinsightsAccountId, "account-id", "", "", "Account ID")
 	_applicationinsightsCmd.Flags().StringVarP(&_applicationinsightsAttachMissingPermission, "attach-missing-permission", "", "", "Attach Missing Permission")

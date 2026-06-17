@@ -14,6 +14,7 @@ var _budgetsCmd = &cobra.Command{
 	Use:   "budgets",
 	Short: "AWS budgets CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1232,10 +1233,10 @@ func init() {
 	_rootCmd.AddCommand(_budgetsCmd)
 	_budgetsCmd.Flags().SortFlags = false
 
-	_budgetsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_budgetsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_budgetsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_budgetsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_budgetsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_budgetsCmd.Flags().StringVarP(&_budgetsAccountId, "account-id", "", "", "Account ID")
 	_budgetsCmd.Flags().StringVarP(&_budgetsActionId, "action-id", "", "", "Action ID")

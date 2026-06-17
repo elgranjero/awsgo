@@ -14,6 +14,7 @@ var _ssmsapCmd = &cobra.Command{
 	Use:   "ssmsap",
 	Short: "AWS ssmsap CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1074,10 +1075,10 @@ func init() {
 	_rootCmd.AddCommand(_ssmsapCmd)
 	_ssmsapCmd.Flags().SortFlags = false
 
-	_ssmsapCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ssmsapCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ssmsapCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ssmsapCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ssmsapCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ssmsapCmd.Flags().StringVarP(&_ssmsapActionType, "action-type", "", "", "Action Type")
 	_ssmsapCmd.Flags().StringVarP(&_ssmsapAppRegistryArn, "app-registry-arn", "", "", "App Registry ARN")

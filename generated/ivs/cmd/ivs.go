@@ -14,6 +14,7 @@ var _ivsCmd = &cobra.Command{
 	Use:   "ivs",
 	Short: "AWS ivs CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1313,10 +1314,10 @@ func init() {
 	_rootCmd.AddCommand(_ivsCmd)
 	_ivsCmd.Flags().SortFlags = false
 
-	_ivsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ivsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ivsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ivsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ivsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ivsCmd.Flags().StringSliceVarP(&_ivsAllowedCountries, "allowed-countries", "", nil, "Allowed Countries")
 	_ivsCmd.Flags().StringSliceVarP(&_ivsAllowedOrigins, "allowed-origins", "", nil, "Allowed Origins")

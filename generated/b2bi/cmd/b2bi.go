@@ -14,6 +14,7 @@ var _b2biCmd = &cobra.Command{
 	Use:   "b2bi",
 	Short: "AWS b2bi CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1296,10 +1297,10 @@ func init() {
 	_rootCmd.AddCommand(_b2biCmd)
 	_b2biCmd.Flags().SortFlags = false
 
-	_b2biCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_b2biCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_b2biCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_b2biCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_b2biCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_b2biCmd.Flags().StringVarP(&_b2biAdvancedOptions, "advanced-options", "", "", "Advanced Options")
 	_b2biCmd.Flags().StringVarP(&_b2biBusinessName, "business-name", "", "", "Business Name")

@@ -14,6 +14,7 @@ var _cloudformationCmd = &cobra.Command{
 	Use:   "cloudformation",
 	Short: "AWS cloudformation CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -4557,10 +4558,10 @@ func init() {
 	_rootCmd.AddCommand(_cloudformationCmd)
 	_cloudformationCmd.Flags().SortFlags = false
 
-	_cloudformationCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_cloudformationCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_cloudformationCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_cloudformationCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_cloudformationCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_cloudformationCmd.Flags().StringVarP(&_cloudformationAcceptTermsAndConditions, "accept-terms-and-conditions", "", "", "Accept Terms And Conditions")
 	_cloudformationCmd.Flags().StringSliceVarP(&_cloudformationAccounts, "accounts", "", nil, "Accounts")

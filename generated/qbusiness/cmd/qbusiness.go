@@ -14,6 +14,7 @@ var _qbusinessCmd = &cobra.Command{
 	Use:   "qbusiness",
 	Short: "AWS qbusiness CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3782,10 +3783,10 @@ func init() {
 	_rootCmd.AddCommand(_qbusinessCmd)
 	_qbusinessCmd.Flags().SortFlags = false
 
-	_qbusinessCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_qbusinessCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_qbusinessCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_qbusinessCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_qbusinessCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_qbusinessCmd.Flags().StringVarP(&_qbusinessActionConfigurations, "action-configurations", "", "", "Action Configurations")
 	_qbusinessCmd.Flags().StringVarP(&_qbusinessActionExecution, "action-execution", "", "", "Action Execution")

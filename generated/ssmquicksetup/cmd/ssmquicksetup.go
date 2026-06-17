@@ -14,6 +14,7 @@ var _ssmquicksetupCmd = &cobra.Command{
 	Use:   "ssmquicksetup",
 	Short: "AWS ssmquicksetup CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -472,10 +473,10 @@ func init() {
 	_rootCmd.AddCommand(_ssmquicksetupCmd)
 	_ssmquicksetupCmd.Flags().SortFlags = false
 
-	_ssmquicksetupCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ssmquicksetupCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ssmquicksetupCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ssmquicksetupCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ssmquicksetupCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ssmquicksetupCmd.Flags().StringVarP(&_ssmquicksetupConfigurationDefinitionId, "configuration-definition-id", "", "", "Configuration Definition ID")
 	_ssmquicksetupCmd.Flags().StringVarP(&_ssmquicksetupConfigurationDefinitions, "configuration-definitions", "", "", "Configuration Definitions")

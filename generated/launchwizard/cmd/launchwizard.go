@@ -14,6 +14,7 @@ var _launchwizardCmd = &cobra.Command{
 	Use:   "launchwizard",
 	Short: "AWS launchwizard CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -610,10 +611,10 @@ func init() {
 	_rootCmd.AddCommand(_launchwizardCmd)
 	_launchwizardCmd.Flags().SortFlags = false
 
-	_launchwizardCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_launchwizardCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_launchwizardCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_launchwizardCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_launchwizardCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_launchwizardCmd.Flags().StringVarP(&_launchwizardDeploymentId, "deployment-id", "", "", "Deployment ID")
 	_launchwizardCmd.Flags().StringVarP(&_launchwizardDeploymentPatternName, "deployment-pattern-name", "", "", "Deployment Pattern Name")

@@ -14,6 +14,7 @@ var _servicecatalogCmd = &cobra.Command{
 	Use:   "servicecatalog",
 	Short: "AWS servicecatalog CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3994,10 +3995,10 @@ func init() {
 	_rootCmd.AddCommand(_servicecatalogCmd)
 	_servicecatalogCmd.Flags().SortFlags = false
 
-	_servicecatalogCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_servicecatalogCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_servicecatalogCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_servicecatalogCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_servicecatalogCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_servicecatalogCmd.Flags().StringVarP(&_servicecatalogAcceptLanguage, "accept-language", "", "", "Accept Language")
 	_servicecatalogCmd.Flags().StringVarP(&_servicecatalogAccessLevelFilter, "access-level-filter", "", "", "Access Level Filter")

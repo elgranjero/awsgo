@@ -14,6 +14,7 @@ var _route53globalresolverCmd = &cobra.Command{
 	Use:   "route53globalresolver",
 	Short: "AWS route53globalresolver CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1749,10 +1750,10 @@ func init() {
 	_rootCmd.AddCommand(_route53globalresolverCmd)
 	_route53globalresolverCmd.Flags().SortFlags = false
 
-	_route53globalresolverCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_route53globalresolverCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_route53globalresolverCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_route53globalresolverCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_route53globalresolverCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_route53globalresolverCmd.Flags().StringVarP(&_route53globalresolverAccessSourceId, "access-source-id", "", "", "Access Source ID")
 	_route53globalresolverCmd.Flags().StringVarP(&_route53globalresolverAccessTokenId, "access-token-id", "", "", "Access Token ID")

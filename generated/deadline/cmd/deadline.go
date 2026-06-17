@@ -14,6 +14,7 @@ var _deadlineCmd = &cobra.Command{
 	Use:   "deadline",
 	Short: "AWS deadline CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -4958,10 +4959,10 @@ func init() {
 	_rootCmd.AddCommand(_deadlineCmd)
 	_deadlineCmd.Flags().SortFlags = false
 
-	_deadlineCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_deadlineCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_deadlineCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_deadlineCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_deadlineCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_deadlineCmd.Flags().StringVarP(&_deadlineActions, "actions", "", "", "Actions")
 	_deadlineCmd.Flags().StringVarP(&_deadlineActionsToAdd, "actions-to-add", "", "", "Actions To Add")

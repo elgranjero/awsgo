@@ -14,6 +14,7 @@ var _tnbCmd = &cobra.Command{
 	Use:   "tnb",
 	Short: "AWS tnb CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1254,10 +1255,10 @@ func init() {
 	_rootCmd.AddCommand(_tnbCmd)
 	_tnbCmd.Flags().SortFlags = false
 
-	_tnbCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_tnbCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_tnbCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_tnbCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_tnbCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_tnbCmd.Flags().StringVarP(&_tnbAccept, "accept", "", "", "Accept")
 	_tnbCmd.Flags().StringVarP(&_tnbAdditionalParamsForNs, "additional-params-for-ns", "", "", "Additional Params For Ns")

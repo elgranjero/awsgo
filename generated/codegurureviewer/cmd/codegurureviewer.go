@@ -14,6 +14,7 @@ var _codegurureviewerCmd = &cobra.Command{
 	Use:   "codegurureviewer",
 	Short: "AWS codegurureviewer CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -614,10 +615,10 @@ func init() {
 	_rootCmd.AddCommand(_codegurureviewerCmd)
 	_codegurureviewerCmd.Flags().SortFlags = false
 
-	_codegurureviewerCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_codegurureviewerCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_codegurureviewerCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_codegurureviewerCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_codegurureviewerCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_codegurureviewerCmd.Flags().StringVarP(&_codegurureviewerAssociationArn, "association-arn", "", "", "Association ARN")
 	_codegurureviewerCmd.Flags().StringVarP(&_codegurureviewerClientRequestToken, "client-request-token", "", "", "Client Request Token")

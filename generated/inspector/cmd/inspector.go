@@ -14,6 +14,7 @@ var _inspectorCmd = &cobra.Command{
 	Use:   "inspector",
 	Short: "AWS inspector CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1341,10 +1342,10 @@ func init() {
 	_rootCmd.AddCommand(_inspectorCmd)
 	_inspectorCmd.Flags().SortFlags = false
 
-	_inspectorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_inspectorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_inspectorCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_inspectorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_inspectorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_inspectorCmd.Flags().StringVarP(&_inspectorAssessmentRunArn, "assessment-run-arn", "", "", "Assessment Run ARN")
 	_inspectorCmd.Flags().StringSliceVarP(&_inspectorAssessmentRunArns, "assessment-run-arns", "", nil, "Assessment Run Arns")

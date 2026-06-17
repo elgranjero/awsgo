@@ -14,6 +14,7 @@ var _elasticsearchserviceCmd = &cobra.Command{
 	Use:   "elasticsearchservice",
 	Short: "AWS elasticsearchservice CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1872,10 +1873,10 @@ func init() {
 	_rootCmd.AddCommand(_elasticsearchserviceCmd)
 	_elasticsearchserviceCmd.Flags().SortFlags = false
 
-	_elasticsearchserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_elasticsearchserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_elasticsearchserviceCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_elasticsearchserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_elasticsearchserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_elasticsearchserviceCmd.Flags().StringVarP(&_elasticsearchserviceAccessPolicies, "access-policies", "", "", "Access Policies")
 	_elasticsearchserviceCmd.Flags().StringVarP(&_elasticsearchserviceAccount, "account", "", "", "Account")

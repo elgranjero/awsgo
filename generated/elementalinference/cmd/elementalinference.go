@@ -14,6 +14,7 @@ var _elementalinferenceCmd = &cobra.Command{
 	Use:   "elementalinference",
 	Short: "AWS elementalinference CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -366,10 +367,10 @@ func init() {
 	_rootCmd.AddCommand(_elementalinferenceCmd)
 	_elementalinferenceCmd.Flags().SortFlags = false
 
-	_elementalinferenceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_elementalinferenceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_elementalinferenceCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_elementalinferenceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_elementalinferenceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_elementalinferenceCmd.Flags().StringVarP(&_elementalinferenceAssociatedResourceName, "associated-resource-name", "", "", "Associated Resource Name")
 	_elementalinferenceCmd.Flags().StringVarP(&_elementalinferenceDryRun, "dry-run", "", "", "Dry Run")

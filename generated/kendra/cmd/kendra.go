@@ -14,6 +14,7 @@ var _kendraCmd = &cobra.Command{
 	Use:   "kendra",
 	Short: "AWS kendra CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3194,10 +3195,10 @@ func init() {
 	_rootCmd.AddCommand(_kendraCmd)
 	_kendraCmd.Flags().SortFlags = false
 
-	_kendraCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_kendraCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_kendraCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_kendraCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_kendraCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_kendraCmd.Flags().StringVarP(&_kendraAccessControlList, "access-control-list", "", "", "Access Control List")
 	_kendraCmd.Flags().StringVarP(&_kendraAttributeFilter, "attribute-filter", "", "", "Attribute Filter")

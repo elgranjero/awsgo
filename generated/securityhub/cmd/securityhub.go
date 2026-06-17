@@ -14,6 +14,7 @@ var _securityhubCmd = &cobra.Command{
 	Use:   "securityhub",
 	Short: "AWS securityhub CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -4111,10 +4112,10 @@ func init() {
 	_rootCmd.AddCommand(_securityhubCmd)
 	_securityhubCmd.Flags().SortFlags = false
 
-	_securityhubCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_securityhubCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_securityhubCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_securityhubCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_securityhubCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_securityhubCmd.Flags().StringVarP(&_securityhubAccountDetails, "account-details", "", "", "Account Details")
 	_securityhubCmd.Flags().StringSliceVarP(&_securityhubAccountIds, "account-ids", "", nil, "Account Ids")

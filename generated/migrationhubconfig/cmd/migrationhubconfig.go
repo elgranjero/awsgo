@@ -14,6 +14,7 @@ var _migrationhubconfigCmd = &cobra.Command{
 	Use:   "migrationhubconfig",
 	Short: "AWS migrationhubconfig CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -177,10 +178,10 @@ func init() {
 	_rootCmd.AddCommand(_migrationhubconfigCmd)
 	_migrationhubconfigCmd.Flags().SortFlags = false
 
-	_migrationhubconfigCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_migrationhubconfigCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_migrationhubconfigCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_migrationhubconfigCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_migrationhubconfigCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_migrationhubconfigCmd.Flags().StringVarP(&_migrationhubconfigControlId, "control-id", "", "", "Control ID")
 	_migrationhubconfigCmd.Flags().StringVarP(&_migrationhubconfigDryRun, "dry-run", "", "", "Dry Run")

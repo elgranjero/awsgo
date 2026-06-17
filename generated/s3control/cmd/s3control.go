@@ -14,6 +14,7 @@ var _s3controlCmd = &cobra.Command{
 	Use:   "s3control",
 	Short: "AWS s3control CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -5209,10 +5210,10 @@ func init() {
 	_rootCmd.AddCommand(_s3controlCmd)
 	_s3controlCmd.Flags().SortFlags = false
 
-	_s3controlCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_s3controlCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_s3controlCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_s3controlCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_s3controlCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_s3controlCmd.Flags().StringVarP(&_s3controlAccessGrantId, "access-grant-id", "", "", "Access Grant ID")
 	_s3controlCmd.Flags().StringVarP(&_s3controlAccessGrantsLocationConfiguration, "access-grants-location-configuration", "", "", "Access Grants Location Configuration")

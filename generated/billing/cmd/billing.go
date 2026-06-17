@@ -14,6 +14,7 @@ var _billingCmd = &cobra.Command{
 	Use:   "billing",
 	Short: "AWS billing CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -469,10 +470,10 @@ func init() {
 	_rootCmd.AddCommand(_billingCmd)
 	_billingCmd.Flags().SortFlags = false
 
-	_billingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_billingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_billingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_billingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_billingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_billingCmd.Flags().StringVarP(&_billingActiveTimeRange, "active-time-range", "", "", "Active Time Range")
 	_billingCmd.Flags().StringVarP(&_billingArn, "arn", "", "", "ARN")

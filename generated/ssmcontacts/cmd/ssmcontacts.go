@@ -14,6 +14,7 @@ var _ssmcontactsCmd = &cobra.Command{
 	Use:   "ssmcontacts",
 	Short: "AWS ssmcontacts CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1555,10 +1556,10 @@ func init() {
 	_rootCmd.AddCommand(_ssmcontactsCmd)
 	_ssmcontactsCmd.Flags().SortFlags = false
 
-	_ssmcontactsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ssmcontactsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ssmcontactsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ssmcontactsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ssmcontactsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ssmcontactsCmd.Flags().StringVarP(&_ssmcontactsAcceptCode, "accept-code", "", "", "Accept Code")
 	_ssmcontactsCmd.Flags().StringVarP(&_ssmcontactsAcceptCodeValidation, "accept-code-validation", "", "", "Accept Code Validation")

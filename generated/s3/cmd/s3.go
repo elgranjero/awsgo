@@ -14,6 +14,7 @@ var _s3Cmd = &cobra.Command{
 	Use:   "s3",
 	Short: "AWS s3 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -11289,10 +11290,10 @@ func init() {
 	_rootCmd.AddCommand(_s3Cmd)
 	_s3Cmd.Flags().SortFlags = false
 
-	_s3Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_s3Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_s3Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_s3Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_s3Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_s3Cmd.Flags().StringVarP(&_s3AbacStatus, "abac-status", "", "", "Abac Status")
 	_s3Cmd.Flags().StringVarP(&_s3AccelerateConfiguration, "accelerate-configuration", "", "", "Accelerate Configuration")

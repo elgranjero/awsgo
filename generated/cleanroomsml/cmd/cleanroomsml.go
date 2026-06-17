@@ -14,6 +14,7 @@ var _cleanroomsmlCmd = &cobra.Command{
 	Use:   "cleanroomsml",
 	Short: "AWS cleanroomsml CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2353,10 +2354,10 @@ func init() {
 	_rootCmd.AddCommand(_cleanroomsmlCmd)
 	_cleanroomsmlCmd.Flags().SortFlags = false
 
-	_cleanroomsmlCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_cleanroomsmlCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_cleanroomsmlCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_cleanroomsmlCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_cleanroomsmlCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_cleanroomsmlCmd.Flags().StringVarP(&_cleanroomsmlAudienceGenerationJobArn, "audience-generation-job-arn", "", "", "Audience Generation Job ARN")
 	_cleanroomsmlCmd.Flags().StringVarP(&_cleanroomsmlAudienceModelArn, "audience-model-arn", "", "", "Audience Model ARN")

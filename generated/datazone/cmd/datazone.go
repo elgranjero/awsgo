@@ -14,6 +14,7 @@ var _datazoneCmd = &cobra.Command{
 	Use:   "datazone",
 	Short: "AWS datazone CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -8498,10 +8499,10 @@ func init() {
 	_rootCmd.AddCommand(_datazoneCmd)
 	_datazoneCmd.Flags().SortFlags = false
 
-	_datazoneCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_datazoneCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_datazoneCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_datazoneCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_datazoneCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_datazoneCmd.Flags().StringVarP(&_datazoneAcceptChoices, "accept-choices", "", "", "Accept Choices")
 	_datazoneCmd.Flags().StringVarP(&_datazoneAcceptRule, "accept-rule", "", "", "Accept Rule")

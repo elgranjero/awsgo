@@ -14,6 +14,7 @@ var _neptuneCmd = &cobra.Command{
 	Use:   "neptune",
 	Short: "AWS neptune CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3668,10 +3669,10 @@ func init() {
 	_rootCmd.AddCommand(_neptuneCmd)
 	_neptuneCmd.Flags().SortFlags = false
 
-	_neptuneCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_neptuneCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_neptuneCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_neptuneCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_neptuneCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_neptuneCmd.Flags().StringVarP(&_neptuneAllocatedStorage, "allocated-storage", "", "", "Allocated Storage")
 	_neptuneCmd.Flags().StringVarP(&_neptuneAllowDataLoss, "allow-data-loss", "", "", "Allow Data Loss")

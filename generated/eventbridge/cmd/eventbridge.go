@@ -14,6 +14,7 @@ var _eventbridgeCmd = &cobra.Command{
 	Use:   "eventbridge",
 	Short: "AWS eventbridge CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2324,10 +2325,10 @@ func init() {
 	_rootCmd.AddCommand(_eventbridgeCmd)
 	_eventbridgeCmd.Flags().SortFlags = false
 
-	_eventbridgeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_eventbridgeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_eventbridgeCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_eventbridgeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_eventbridgeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_eventbridgeCmd.Flags().StringVarP(&_eventbridgeAccount, "account", "", "", "Account")
 	_eventbridgeCmd.Flags().StringVarP(&_eventbridgeAction, "action", "", "", "Action")

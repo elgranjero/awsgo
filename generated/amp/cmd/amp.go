@@ -14,6 +14,7 @@ var _ampCmd = &cobra.Command{
 	Use:   "amp",
 	Short: "AWS amp CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1629,10 +1630,10 @@ func init() {
 	_rootCmd.AddCommand(_ampCmd)
 	_ampCmd.Flags().SortFlags = false
 
-	_ampCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ampCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ampCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ampCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ampCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ampCmd.Flags().StringVarP(&_ampAlias, "alias", "", "", "Alias")
 	_ampCmd.Flags().StringVarP(&_ampAnomalyDetectorId, "anomaly-detector-id", "", "", "Anomaly Detector ID")

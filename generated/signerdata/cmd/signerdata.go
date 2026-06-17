@@ -14,6 +14,7 @@ var _signerdataCmd = &cobra.Command{
 	Use:   "signerdata",
 	Short: "AWS signerdata CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -83,10 +84,10 @@ func init() {
 	_rootCmd.AddCommand(_signerdataCmd)
 	_signerdataCmd.Flags().SortFlags = false
 
-	_signerdataCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_signerdataCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_signerdataCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_signerdataCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_signerdataCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_signerdataCmd.Flags().StringSliceVarP(&_signerdataCertificateHashes, "certificate-hashes", "", nil, "Certificate Hashes")
 	_signerdataCmd.Flags().StringVarP(&_signerdataJobArn, "job-arn", "", "", "Job ARN")

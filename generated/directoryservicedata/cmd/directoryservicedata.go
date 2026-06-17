@@ -14,6 +14,7 @@ var _directoryservicedataCmd = &cobra.Command{
 	Use:   "directoryservicedata",
 	Short: "AWS directoryservicedata CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -862,10 +863,10 @@ func init() {
 	_rootCmd.AddCommand(_directoryservicedataCmd)
 	_directoryservicedataCmd.Flags().SortFlags = false
 
-	_directoryservicedataCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_directoryservicedataCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_directoryservicedataCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_directoryservicedataCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_directoryservicedataCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_directoryservicedataCmd.Flags().StringVarP(&_directoryservicedataClientToken, "client-token", "", "", "Client Token")
 	_directoryservicedataCmd.Flags().StringVarP(&_directoryservicedataDirectoryId, "directory-id", "", "", "Directory ID")

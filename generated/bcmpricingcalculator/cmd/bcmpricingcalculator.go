@@ -14,6 +14,7 @@ var _bcmpricingcalculatorCmd = &cobra.Command{
 	Use:   "bcmpricingcalculator",
 	Short: "AWS bcmpricingcalculator CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1427,10 +1428,10 @@ func init() {
 	_rootCmd.AddCommand(_bcmpricingcalculatorCmd)
 	_bcmpricingcalculatorCmd.Flags().SortFlags = false
 
-	_bcmpricingcalculatorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_bcmpricingcalculatorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_bcmpricingcalculatorCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_bcmpricingcalculatorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_bcmpricingcalculatorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_bcmpricingcalculatorCmd.Flags().StringVarP(&_bcmpricingcalculatorArn, "arn", "", "", "ARN")
 	_bcmpricingcalculatorCmd.Flags().StringVarP(&_bcmpricingcalculatorBillEstimateId, "bill-estimate-id", "", "", "Bill Estimate ID")

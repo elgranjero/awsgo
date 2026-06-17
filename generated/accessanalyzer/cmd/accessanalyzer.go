@@ -14,6 +14,7 @@ var _accessanalyzerCmd = &cobra.Command{
 	Use:   "accessanalyzer",
 	Short: "AWS accessanalyzer CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1510,10 +1511,10 @@ func init() {
 	_rootCmd.AddCommand(_accessanalyzerCmd)
 	_accessanalyzerCmd.Flags().SortFlags = false
 
-	_accessanalyzerCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_accessanalyzerCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_accessanalyzerCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_accessanalyzerCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_accessanalyzerCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_accessanalyzerCmd.Flags().StringVarP(&_accessanalyzerAccess, "access", "", "", "Access")
 	_accessanalyzerCmd.Flags().StringVarP(&_accessanalyzerAccessPreviewId, "access-preview-id", "", "", "Access Preview ID")

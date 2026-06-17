@@ -14,6 +14,7 @@ var _lexmodelsv2Cmd = &cobra.Command{
 	Use:   "lexmodelsv2",
 	Short: "AWS lexmodelsv2 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -5079,10 +5080,10 @@ func init() {
 	_rootCmd.AddCommand(_lexmodelsv2Cmd)
 	_lexmodelsv2Cmd.Flags().SortFlags = false
 
-	_lexmodelsv2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_lexmodelsv2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_lexmodelsv2Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_lexmodelsv2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_lexmodelsv2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_lexmodelsv2Cmd.Flags().StringSliceVarP(&_lexmodelsv2Action, "action", "", nil, "Action")
 	_lexmodelsv2Cmd.Flags().StringVarP(&_lexmodelsv2AggregationDuration, "aggregation-duration", "", "", "Aggregation Duration")

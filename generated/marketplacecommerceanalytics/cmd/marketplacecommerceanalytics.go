@@ -14,6 +14,7 @@ var _marketplacecommerceanalyticsCmd = &cobra.Command{
 	Use:   "marketplacecommerceanalytics",
 	Short: "AWS marketplacecommerceanalytics CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -174,10 +175,10 @@ func init() {
 	_rootCmd.AddCommand(_marketplacecommerceanalyticsCmd)
 	_marketplacecommerceanalyticsCmd.Flags().SortFlags = false
 
-	_marketplacecommerceanalyticsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_marketplacecommerceanalyticsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_marketplacecommerceanalyticsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_marketplacecommerceanalyticsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_marketplacecommerceanalyticsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_marketplacecommerceanalyticsCmd.Flags().StringVarP(&_marketplacecommerceanalyticsCustomerDefinedValues, "customer-defined-values", "", "", "Customer Defined Values")
 	_marketplacecommerceanalyticsCmd.Flags().StringVarP(&_marketplacecommerceanalyticsDataSetPublicationDate, "data-set-publication-date", "", "", "Data Set Publication Date")

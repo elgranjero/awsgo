@@ -14,6 +14,7 @@ var _supportCmd = &cobra.Command{
 	Use:   "support",
 	Short: "AWS support CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -870,10 +871,10 @@ func init() {
 	_rootCmd.AddCommand(_supportCmd)
 	_supportCmd.Flags().SortFlags = false
 
-	_supportCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_supportCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_supportCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_supportCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_supportCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_supportCmd.Flags().StringVarP(&_supportAfterTime, "after-time", "", "", "After Time")
 	_supportCmd.Flags().StringVarP(&_supportAttachmentId, "attachment-id", "", "", "Attachment ID")

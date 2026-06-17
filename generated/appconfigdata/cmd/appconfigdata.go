@@ -14,6 +14,7 @@ var _appconfigdataCmd = &cobra.Command{
 	Use:   "appconfigdata",
 	Short: "AWS appconfigdata CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -119,10 +120,10 @@ func init() {
 	_rootCmd.AddCommand(_appconfigdataCmd)
 	_appconfigdataCmd.Flags().SortFlags = false
 
-	_appconfigdataCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_appconfigdataCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_appconfigdataCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_appconfigdataCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_appconfigdataCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_appconfigdataCmd.Flags().StringVarP(&_appconfigdataApplicationIdentifier, "application-identifier", "", "", "Application Identifier")
 	_appconfigdataCmd.Flags().StringVarP(&_appconfigdataConfigurationProfileIdentifier, "configuration-profile-identifier", "", "", "Configuration Profile Identifier")

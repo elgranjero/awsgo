@@ -14,6 +14,7 @@ var _iotsecuretunnelingCmd = &cobra.Command{
 	Use:   "iotsecuretunneling",
 	Short: "AWS iotsecuretunneling CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -329,10 +330,10 @@ func init() {
 	_rootCmd.AddCommand(_iotsecuretunnelingCmd)
 	_iotsecuretunnelingCmd.Flags().SortFlags = false
 
-	_iotsecuretunnelingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_iotsecuretunnelingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_iotsecuretunnelingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_iotsecuretunnelingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_iotsecuretunnelingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_iotsecuretunnelingCmd.Flags().StringVarP(&_iotsecuretunnelingClientMode, "client-mode", "", "", "Client Mode")
 	_iotsecuretunnelingCmd.Flags().StringVarP(&_iotsecuretunnelingDelete, "delete", "", "", "Delete")

@@ -14,6 +14,7 @@ var _iotwirelessCmd = &cobra.Command{
 	Use:   "iotwireless",
 	Short: "AWS iotwireless CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3867,10 +3868,10 @@ func init() {
 	_rootCmd.AddCommand(_iotwirelessCmd)
 	_iotwirelessCmd.Flags().SortFlags = false
 
-	_iotwirelessCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_iotwirelessCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_iotwirelessCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_iotwirelessCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_iotwirelessCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_iotwirelessCmd.Flags().StringVarP(&_iotwirelessAutoCreateTasks, "auto-create-tasks", "", "", "Auto Create Tasks")
 	_iotwirelessCmd.Flags().StringVarP(&_iotwirelessCellTowers, "cell-towers", "", "", "Cell Towers")

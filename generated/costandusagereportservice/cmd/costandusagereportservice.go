@@ -14,6 +14,7 @@ var _costandusagereportserviceCmd = &cobra.Command{
 	Use:   "costandusagereportservice",
 	Short: "AWS costandusagereportservice CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -249,10 +250,10 @@ func init() {
 	_rootCmd.AddCommand(_costandusagereportserviceCmd)
 	_costandusagereportserviceCmd.Flags().SortFlags = false
 
-	_costandusagereportserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_costandusagereportserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_costandusagereportserviceCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_costandusagereportserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_costandusagereportserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_costandusagereportserviceCmd.Flags().StringVarP(&_costandusagereportserviceMaxResults, "max-results", "", "", "Max Results")
 	_costandusagereportserviceCmd.Flags().StringVarP(&_costandusagereportserviceNextToken, "next-token", "", "", "Next Token")

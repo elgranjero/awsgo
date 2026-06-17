@@ -14,6 +14,7 @@ var _pinpointCmd = &cobra.Command{
 	Use:   "pinpoint",
 	Short: "AWS pinpoint CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3699,10 +3700,10 @@ func init() {
 	_rootCmd.AddCommand(_pinpointCmd)
 	_pinpointCmd.Flags().SortFlags = false
 
-	_pinpointCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_pinpointCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_pinpointCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_pinpointCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_pinpointCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_pinpointCmd.Flags().StringVarP(&_pinpointADMChannelRequest, "adm-channel-request", "", "", "Adm Channel Request")
 	_pinpointCmd.Flags().StringVarP(&_pinpointAPNSChannelRequest, "apns-channel-request", "", "", "Apns Channel Request")

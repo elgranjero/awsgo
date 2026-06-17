@@ -14,6 +14,7 @@ var _wafregionalCmd = &cobra.Command{
 	Use:   "wafregional",
 	Short: "AWS wafregional CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -4136,10 +4137,10 @@ func init() {
 	_rootCmd.AddCommand(_wafregionalCmd)
 	_wafregionalCmd.Flags().SortFlags = false
 
-	_wafregionalCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_wafregionalCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_wafregionalCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_wafregionalCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_wafregionalCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_wafregionalCmd.Flags().StringVarP(&_wafregionalByteMatchSetId, "byte-match-set-id", "", "", "Byte Match Set ID")
 	_wafregionalCmd.Flags().StringVarP(&_wafregionalChangeToken, "change-token", "", "", "Change Token")

@@ -14,6 +14,7 @@ var _lexmodelbuildingserviceCmd = &cobra.Command{
 	Use:   "lexmodelbuildingservice",
 	Short: "AWS lexmodelbuildingservice CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2005,10 +2006,10 @@ func init() {
 	_rootCmd.AddCommand(_lexmodelbuildingserviceCmd)
 	_lexmodelbuildingserviceCmd.Flags().SortFlags = false
 
-	_lexmodelbuildingserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_lexmodelbuildingserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_lexmodelbuildingserviceCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_lexmodelbuildingserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_lexmodelbuildingserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_lexmodelbuildingserviceCmd.Flags().StringVarP(&_lexmodelbuildingserviceAbortStatement, "abort-statement", "", "", "Abort Statement")
 	_lexmodelbuildingserviceCmd.Flags().StringVarP(&_lexmodelbuildingserviceBotAlias, "bot-alias", "", "", "Bot Alias")

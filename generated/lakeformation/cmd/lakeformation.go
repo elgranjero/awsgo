@@ -14,6 +14,7 @@ var _lakeformationCmd = &cobra.Command{
 	Use:   "lakeformation",
 	Short: "AWS lakeformation CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2542,10 +2543,10 @@ func init() {
 	_rootCmd.AddCommand(_lakeformationCmd)
 	_lakeformationCmd.Flags().SortFlags = false
 
-	_lakeformationCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_lakeformationCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_lakeformationCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_lakeformationCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_lakeformationCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_lakeformationCmd.Flags().StringVarP(&_lakeformationApplicationStatus, "application-status", "", "", "Application Status")
 	_lakeformationCmd.Flags().StringVarP(&_lakeformationAuditContext, "audit-context", "", "", "Audit Context")

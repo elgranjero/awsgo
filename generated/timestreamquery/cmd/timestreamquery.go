@@ -14,6 +14,7 @@ var _timestreamqueryCmd = &cobra.Command{
 	Use:   "timestreamquery",
 	Short: "AWS timestreamquery CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -651,10 +652,10 @@ func init() {
 	_rootCmd.AddCommand(_timestreamqueryCmd)
 	_timestreamqueryCmd.Flags().SortFlags = false
 
-	_timestreamqueryCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_timestreamqueryCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_timestreamqueryCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_timestreamqueryCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_timestreamqueryCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_timestreamqueryCmd.Flags().StringVarP(&_timestreamqueryClientToken, "client-token", "", "", "Client Token")
 	_timestreamqueryCmd.Flags().StringVarP(&_timestreamqueryErrorReportConfiguration, "error-report-configuration", "", "", "Error Report Configuration")

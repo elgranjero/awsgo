@@ -14,6 +14,7 @@ var _backupgatewayCmd = &cobra.Command{
 	Use:   "backupgateway",
 	Short: "AWS backupgateway CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -848,10 +849,10 @@ func init() {
 	_rootCmd.AddCommand(_backupgatewayCmd)
 	_backupgatewayCmd.Flags().SortFlags = false
 
-	_backupgatewayCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_backupgatewayCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_backupgatewayCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_backupgatewayCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_backupgatewayCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_backupgatewayCmd.Flags().StringVarP(&_backupgatewayActivationKey, "activation-key", "", "", "Activation Key")
 	_backupgatewayCmd.Flags().StringVarP(&_backupgatewayBandwidthRateLimitIntervals, "bandwidth-rate-limit-intervals", "", "", "Bandwidth Rate Limit Intervals")

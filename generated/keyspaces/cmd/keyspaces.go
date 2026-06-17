@@ -14,6 +14,7 @@ var _keyspacesCmd = &cobra.Command{
 	Use:   "keyspaces",
 	Short: "AWS keyspaces CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1066,10 +1067,10 @@ func init() {
 	_rootCmd.AddCommand(_keyspacesCmd)
 	_keyspacesCmd.Flags().SortFlags = false
 
-	_keyspacesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_keyspacesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_keyspacesCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_keyspacesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_keyspacesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_keyspacesCmd.Flags().StringVarP(&_keyspacesAddColumns, "add-columns", "", "", "Add Columns")
 	_keyspacesCmd.Flags().StringVarP(&_keyspacesAutoScalingSpecification, "auto-scaling-specification", "", "", "Auto Scaling Specification")

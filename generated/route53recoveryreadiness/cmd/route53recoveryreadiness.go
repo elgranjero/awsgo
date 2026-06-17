@@ -14,6 +14,7 @@ var _route53recoveryreadinessCmd = &cobra.Command{
 	Use:   "route53recoveryreadiness",
 	Short: "AWS route53recoveryreadiness CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1117,10 +1118,10 @@ func init() {
 	_rootCmd.AddCommand(_route53recoveryreadinessCmd)
 	_route53recoveryreadinessCmd.Flags().SortFlags = false
 
-	_route53recoveryreadinessCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_route53recoveryreadinessCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_route53recoveryreadinessCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_route53recoveryreadinessCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_route53recoveryreadinessCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_route53recoveryreadinessCmd.Flags().StringVarP(&_route53recoveryreadinessCellName, "cell-name", "", "", "Cell Name")
 	_route53recoveryreadinessCmd.Flags().StringSliceVarP(&_route53recoveryreadinessCells, "cells", "", nil, "Cells")

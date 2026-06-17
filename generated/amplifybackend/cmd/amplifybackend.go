@@ -14,6 +14,7 @@ var _amplifybackendCmd = &cobra.Command{
 	Use:   "amplifybackend",
 	Short: "AWS amplifybackend CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1073,10 +1074,10 @@ func init() {
 	_rootCmd.AddCommand(_amplifybackendCmd)
 	_amplifybackendCmd.Flags().SortFlags = false
 
-	_amplifybackendCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_amplifybackendCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_amplifybackendCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_amplifybackendCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_amplifybackendCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_amplifybackendCmd.Flags().StringVarP(&_amplifybackendAppId, "app-id", "", "", "App ID")
 	_amplifybackendCmd.Flags().StringVarP(&_amplifybackendAppName, "app-name", "", "", "App Name")

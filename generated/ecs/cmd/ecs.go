@@ -14,6 +14,7 @@ var _ecsCmd = &cobra.Command{
 	Use:   "ecs",
 	Short: "AWS ecs CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3879,10 +3880,10 @@ func init() {
 	_rootCmd.AddCommand(_ecsCmd)
 	_ecsCmd.Flags().SortFlags = false
 
-	_ecsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ecsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ecsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ecsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ecsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ecsCmd.Flags().StringVarP(&_ecsAttachments, "attachments", "", "", "Attachments")
 	_ecsCmd.Flags().StringVarP(&_ecsAttributeName, "attribute-name", "", "", "Attribute Name")

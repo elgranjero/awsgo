@@ -14,6 +14,7 @@ var _snsCmd = &cobra.Command{
 	Use:   "sns",
 	Short: "AWS sns CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1659,10 +1660,10 @@ func init() {
 	_rootCmd.AddCommand(_snsCmd)
 	_snsCmd.Flags().SortFlags = false
 
-	_snsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_snsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_snsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_snsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_snsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_snsCmd.Flags().StringSliceVarP(&_snsActionName, "action-name", "", nil, "Action Name")
 	_snsCmd.Flags().StringVarP(&_snsAttributeName, "attribute-name", "", "", "Attribute Name")

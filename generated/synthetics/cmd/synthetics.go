@@ -14,6 +14,7 @@ var _syntheticsCmd = &cobra.Command{
 	Use:   "synthetics",
 	Short: "AWS synthetics CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1143,10 +1144,10 @@ func init() {
 	_rootCmd.AddCommand(_syntheticsCmd)
 	_syntheticsCmd.Flags().SortFlags = false
 
-	_syntheticsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_syntheticsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_syntheticsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_syntheticsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_syntheticsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_syntheticsCmd.Flags().StringVarP(&_syntheticsArtifactConfig, "artifact-config", "", "", "Artifact Config")
 	_syntheticsCmd.Flags().StringVarP(&_syntheticsArtifactS3Location, "artifact-s3-location", "", "", "Artifact S3 Location")

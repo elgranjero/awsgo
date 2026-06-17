@@ -14,6 +14,7 @@ var _pricingCmd = &cobra.Command{
 	Use:   "pricing",
 	Short: "AWS pricing CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -321,10 +322,10 @@ func init() {
 	_rootCmd.AddCommand(_pricingCmd)
 	_pricingCmd.Flags().SortFlags = false
 
-	_pricingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_pricingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_pricingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_pricingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_pricingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_pricingCmd.Flags().StringVarP(&_pricingAttributeName, "attribute-name", "", "", "Attribute Name")
 	_pricingCmd.Flags().StringVarP(&_pricingCurrencyCode, "currency-code", "", "", "Currency Code")

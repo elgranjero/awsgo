@@ -14,6 +14,7 @@ var _healthCmd = &cobra.Command{
 	Use:   "health",
 	Short: "AWS health CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -773,10 +774,10 @@ func init() {
 	_rootCmd.AddCommand(_healthCmd)
 	_healthCmd.Flags().SortFlags = false
 
-	_healthCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_healthCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_healthCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_healthCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_healthCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_healthCmd.Flags().StringVarP(&_healthAggregateField, "aggregate-field", "", "", "Aggregate Field")
 	_healthCmd.Flags().StringSliceVarP(&_healthAwsAccountIds, "aws-account-ids", "", nil, "AWS Account Ids")

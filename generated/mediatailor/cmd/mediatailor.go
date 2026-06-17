@@ -14,6 +14,7 @@ var _mediatailorCmd = &cobra.Command{
 	Use:   "mediatailor",
 	Short: "AWS mediatailor CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1801,10 +1802,10 @@ func init() {
 	_rootCmd.AddCommand(_mediatailorCmd)
 	_mediatailorCmd.Flags().SortFlags = false
 
-	_mediatailorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_mediatailorCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_mediatailorCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_mediatailorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_mediatailorCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_mediatailorCmd.Flags().StringVarP(&_mediatailorAccessConfiguration, "access-configuration", "", "", "Access Configuration")
 	_mediatailorCmd.Flags().StringVarP(&_mediatailorAdBreaks, "ad-breaks", "", "", "Ad Breaks")

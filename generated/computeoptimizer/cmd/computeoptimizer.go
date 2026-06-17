@@ -14,6 +14,7 @@ var _computeoptimizerCmd = &cobra.Command{
 	Use:   "computeoptimizer",
 	Short: "AWS computeoptimizer CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1604,10 +1605,10 @@ func init() {
 	_rootCmd.AddCommand(_computeoptimizerCmd)
 	_computeoptimizerCmd.Flags().SortFlags = false
 
-	_computeoptimizerCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_computeoptimizerCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_computeoptimizerCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_computeoptimizerCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_computeoptimizerCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_computeoptimizerCmd.Flags().StringSliceVarP(&_computeoptimizerAccountIds, "account-ids", "", nil, "Account Ids")
 	_computeoptimizerCmd.Flags().StringSliceVarP(&_computeoptimizerAutoScalingGroupArns, "auto-scaling-group-arns", "", nil, "Auto Scaling Group Arns")

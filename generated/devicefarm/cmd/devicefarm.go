@@ -14,6 +14,7 @@ var _devicefarmCmd = &cobra.Command{
 	Use:   "devicefarm",
 	Short: "AWS devicefarm CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2792,10 +2793,10 @@ func init() {
 	_rootCmd.AddCommand(_devicefarmCmd)
 	_devicefarmCmd.Flags().SortFlags = false
 
-	_devicefarmCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_devicefarmCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_devicefarmCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_devicefarmCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_devicefarmCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_devicefarmCmd.Flags().StringVarP(&_devicefarmAppArn, "app-arn", "", "", "App ARN")
 	_devicefarmCmd.Flags().StringVarP(&_devicefarmArn, "arn", "", "", "ARN")

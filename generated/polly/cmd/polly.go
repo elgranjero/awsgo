@@ -14,6 +14,7 @@ var _pollyCmd = &cobra.Command{
 	Use:   "polly",
 	Short: "AWS polly CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -455,10 +456,10 @@ func init() {
 	_rootCmd.AddCommand(_pollyCmd)
 	_pollyCmd.Flags().SortFlags = false
 
-	_pollyCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_pollyCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_pollyCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_pollyCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_pollyCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_pollyCmd.Flags().StringVarP(&_pollyContent, "content", "", "", "Content")
 	_pollyCmd.Flags().StringVarP(&_pollyEngine, "engine", "", "", "Engine")

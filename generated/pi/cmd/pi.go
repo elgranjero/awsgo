@@ -14,6 +14,7 @@ var _piCmd = &cobra.Command{
 	Use:   "pi",
 	Short: "AWS pi CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -754,10 +755,10 @@ func init() {
 	_rootCmd.AddCommand(_piCmd)
 	_piCmd.Flags().SortFlags = false
 
-	_piCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_piCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_piCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_piCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_piCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_piCmd.Flags().StringVarP(&_piAcceptLanguage, "accept-language", "", "", "Accept Language")
 	_piCmd.Flags().StringSliceVarP(&_piAdditionalMetrics, "additional-metrics", "", nil, "Additional Metrics")

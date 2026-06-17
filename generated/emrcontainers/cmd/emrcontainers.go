@@ -14,6 +14,7 @@ var _emrcontainersCmd = &cobra.Command{
 	Use:   "emrcontainers",
 	Short: "AWS emrcontainers CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1064,10 +1065,10 @@ func init() {
 	_rootCmd.AddCommand(_emrcontainersCmd)
 	_emrcontainersCmd.Flags().SortFlags = false
 
-	_emrcontainersCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_emrcontainersCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_emrcontainersCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_emrcontainersCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_emrcontainersCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_emrcontainersCmd.Flags().StringVarP(&_emrcontainersCertificateArn, "certificate-arn", "", "", "Certificate ARN")
 	_emrcontainersCmd.Flags().StringVarP(&_emrcontainersClientToken, "client-token", "", "", "Client Token")

@@ -14,6 +14,7 @@ var _georoutesCmd = &cobra.Command{
 	Use:   "georoutes",
 	Short: "AWS georoutes CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -608,10 +609,10 @@ func init() {
 	_rootCmd.AddCommand(_georoutesCmd)
 	_georoutesCmd.Flags().SortFlags = false
 
-	_georoutesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_georoutesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_georoutesCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_georoutesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_georoutesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_georoutesCmd.Flags().StringVarP(&_georoutesAllow, "allow", "", "", "Allow")
 	_georoutesCmd.Flags().StringVarP(&_georoutesArrivalTime, "arrival-time", "", "", "Arrival Time")

@@ -14,6 +14,7 @@ var _oamCmd = &cobra.Command{
 	Use:   "oam",
 	Short: "AWS oam CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -645,10 +646,10 @@ func init() {
 	_rootCmd.AddCommand(_oamCmd)
 	_oamCmd.Flags().SortFlags = false
 
-	_oamCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_oamCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_oamCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_oamCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_oamCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_oamCmd.Flags().StringVarP(&_oamIdentifier, "identifier", "", "", "Identifier")
 	_oamCmd.Flags().StringVarP(&_oamIncludeTags, "include-tags", "", "", "Include Tags")

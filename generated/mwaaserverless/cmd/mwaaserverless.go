@@ -14,6 +14,7 @@ var _mwaaserverlessCmd = &cobra.Command{
 	Use:   "mwaaserverless",
 	Short: "AWS mwaaserverless CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -681,10 +682,10 @@ func init() {
 	_rootCmd.AddCommand(_mwaaserverlessCmd)
 	_mwaaserverlessCmd.Flags().SortFlags = false
 
-	_mwaaserverlessCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_mwaaserverlessCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_mwaaserverlessCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_mwaaserverlessCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_mwaaserverlessCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_mwaaserverlessCmd.Flags().StringVarP(&_mwaaserverlessClientToken, "client-token", "", "", "Client Token")
 	_mwaaserverlessCmd.Flags().StringVarP(&_mwaaserverlessDefinitionS3Location, "definition-s3-location", "", "", "Definition S3 Location")

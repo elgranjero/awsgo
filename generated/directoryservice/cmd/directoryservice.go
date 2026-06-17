@@ -14,6 +14,7 @@ var _directoryserviceCmd = &cobra.Command{
 	Use:   "directoryservice",
 	Short: "AWS directoryservice CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3037,10 +3038,10 @@ func init() {
 	_rootCmd.AddCommand(_directoryserviceCmd)
 	_directoryserviceCmd.Flags().SortFlags = false
 
-	_directoryserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_directoryserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_directoryserviceCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_directoryserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_directoryserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_directoryserviceCmd.Flags().StringVarP(&_directoryserviceAlias, "alias", "", "", "Alias")
 	_directoryserviceCmd.Flags().StringVarP(&_directoryserviceAssessmentConfiguration, "assessment-configuration", "", "", "Assessment Configuration")

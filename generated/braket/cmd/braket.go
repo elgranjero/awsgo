@@ -14,6 +14,7 @@ var _braketCmd = &cobra.Command{
 	Use:   "braket",
 	Short: "AWS braket CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -760,10 +761,10 @@ func init() {
 	_rootCmd.AddCommand(_braketCmd)
 	_braketCmd.Flags().SortFlags = false
 
-	_braketCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_braketCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_braketCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_braketCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_braketCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_braketCmd.Flags().StringVarP(&_braketAction, "action", "", "", "Action")
 	_braketCmd.Flags().StringVarP(&_braketAdditionalAttributeNames, "additional-attribute-names", "", "", "Additional Attribute Names")

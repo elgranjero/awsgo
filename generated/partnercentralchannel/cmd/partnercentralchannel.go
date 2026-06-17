@@ -14,6 +14,7 @@ var _partnercentralchannelCmd = &cobra.Command{
 	Use:   "partnercentralchannel",
 	Short: "AWS partnercentralchannel CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -788,10 +789,10 @@ func init() {
 	_rootCmd.AddCommand(_partnercentralchannelCmd)
 	_partnercentralchannelCmd.Flags().SortFlags = false
 
-	_partnercentralchannelCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_partnercentralchannelCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_partnercentralchannelCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_partnercentralchannelCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_partnercentralchannelCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_partnercentralchannelCmd.Flags().StringVarP(&_partnercentralchannelAccountId, "account-id", "", "", "Account ID")
 	_partnercentralchannelCmd.Flags().StringSliceVarP(&_partnercentralchannelAccountIds, "account-ids", "", nil, "Account Ids")

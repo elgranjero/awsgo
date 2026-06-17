@@ -14,6 +14,7 @@ var _dsqlCmd = &cobra.Command{
 	Use:   "dsql",
 	Short: "AWS dsql CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -525,10 +526,10 @@ func init() {
 	_rootCmd.AddCommand(_dsqlCmd)
 	_dsqlCmd.Flags().SortFlags = false
 
-	_dsqlCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_dsqlCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_dsqlCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_dsqlCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_dsqlCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_dsqlCmd.Flags().StringVarP(&_dsqlBypassPolicyLockoutSafetyCheck, "bypass-policy-lockout-safety-check", "", "", "Bypass Policy Lockout Safety Check")
 	_dsqlCmd.Flags().StringVarP(&_dsqlClientToken, "client-token", "", "", "Client Token")

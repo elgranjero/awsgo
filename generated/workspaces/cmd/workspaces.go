@@ -14,6 +14,7 @@ var _workspacesCmd = &cobra.Command{
 	Use:   "workspaces",
 	Short: "AWS workspaces CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3442,10 +3443,10 @@ func init() {
 	_rootCmd.AddCommand(_workspacesCmd)
 	_workspacesCmd.Flags().SortFlags = false
 
-	_workspacesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_workspacesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_workspacesCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_workspacesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_workspacesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_workspacesCmd.Flags().StringVarP(&_workspacesActiveDirectoryConfig, "active-directory-config", "", "", "Active Directory Config")
 	_workspacesCmd.Flags().StringVarP(&_workspacesAddInId, "add-in-id", "", "", "Add In ID")

@@ -14,6 +14,7 @@ var _storagegatewayCmd = &cobra.Command{
 	Use:   "storagegateway",
 	Short: "AWS storagegateway CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -4279,10 +4280,10 @@ func init() {
 	_rootCmd.AddCommand(_storagegatewayCmd)
 	_storagegatewayCmd.Flags().SortFlags = false
 
-	_storagegatewayCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_storagegatewayCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_storagegatewayCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_storagegatewayCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_storagegatewayCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_storagegatewayCmd.Flags().StringVarP(&_storagegatewayAccessBasedEnumeration, "access-based-enumeration", "", "", "Access Based Enumeration")
 	_storagegatewayCmd.Flags().StringVarP(&_storagegatewayActivationKey, "activation-key", "", "", "Activation Key")

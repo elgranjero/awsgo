@@ -14,6 +14,7 @@ var _sagemakermetricsCmd = &cobra.Command{
 	Use:   "sagemakermetrics",
 	Short: "AWS sagemakermetrics CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -95,10 +96,10 @@ func init() {
 	_rootCmd.AddCommand(_sagemakermetricsCmd)
 	_sagemakermetricsCmd.Flags().SortFlags = false
 
-	_sagemakermetricsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_sagemakermetricsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_sagemakermetricsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_sagemakermetricsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_sagemakermetricsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_sagemakermetricsCmd.Flags().StringVarP(&_sagemakermetricsMetricData, "metric-data", "", "", "Metric Data")
 	_sagemakermetricsCmd.Flags().StringVarP(&_sagemakermetricsMetricQueries, "metric-queries", "", "", "Metric Queries")

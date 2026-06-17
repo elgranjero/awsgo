@@ -14,6 +14,7 @@ var _dynamodbstreamsCmd = &cobra.Command{
 	Use:   "dynamodbstreams",
 	Short: "AWS dynamodbstreams CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -206,10 +207,10 @@ func init() {
 	_rootCmd.AddCommand(_dynamodbstreamsCmd)
 	_dynamodbstreamsCmd.Flags().SortFlags = false
 
-	_dynamodbstreamsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_dynamodbstreamsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_dynamodbstreamsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_dynamodbstreamsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_dynamodbstreamsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_dynamodbstreamsCmd.Flags().StringVarP(&_dynamodbstreamsExclusiveStartShardId, "exclusive-start-shard-id", "", "", "Exclusive Start Shard ID")
 	_dynamodbstreamsCmd.Flags().StringVarP(&_dynamodbstreamsExclusiveStartStreamArn, "exclusive-start-stream-arn", "", "", "Exclusive Start Stream ARN")

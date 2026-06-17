@@ -14,6 +14,7 @@ var _personalizeeventsCmd = &cobra.Command{
 	Use:   "personalizeevents",
 	Short: "AWS personalizeevents CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -217,10 +218,10 @@ func init() {
 	_rootCmd.AddCommand(_personalizeeventsCmd)
 	_personalizeeventsCmd.Flags().SortFlags = false
 
-	_personalizeeventsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_personalizeeventsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_personalizeeventsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_personalizeeventsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_personalizeeventsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_personalizeeventsCmd.Flags().StringVarP(&_personalizeeventsActionInteractions, "action-interactions", "", "", "Action Interactions")
 	_personalizeeventsCmd.Flags().StringVarP(&_personalizeeventsActions, "actions", "", "", "Actions")

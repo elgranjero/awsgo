@@ -14,6 +14,7 @@ var _codestarconnectionsCmd = &cobra.Command{
 	Use:   "codestarconnections",
 	Short: "AWS codestarconnections CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1017,10 +1018,10 @@ func init() {
 	_rootCmd.AddCommand(_codestarconnectionsCmd)
 	_codestarconnectionsCmd.Flags().SortFlags = false
 
-	_codestarconnectionsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_codestarconnectionsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_codestarconnectionsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_codestarconnectionsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_codestarconnectionsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_codestarconnectionsCmd.Flags().StringVarP(&_codestarconnectionsBranch, "branch", "", "", "Branch")
 	_codestarconnectionsCmd.Flags().StringVarP(&_codestarconnectionsConfigFile, "config-file", "", "", "Config File")

@@ -14,6 +14,7 @@ var _licensemanagerlinuxsubscriptionsCmd = &cobra.Command{
 	Use:   "licensemanagerlinuxsubscriptions",
 	Short: "AWS licensemanagerlinuxsubscriptions CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -418,10 +419,10 @@ func init() {
 	_rootCmd.AddCommand(_licensemanagerlinuxsubscriptionsCmd)
 	_licensemanagerlinuxsubscriptionsCmd.Flags().SortFlags = false
 
-	_licensemanagerlinuxsubscriptionsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_licensemanagerlinuxsubscriptionsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_licensemanagerlinuxsubscriptionsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_licensemanagerlinuxsubscriptionsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_licensemanagerlinuxsubscriptionsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_licensemanagerlinuxsubscriptionsCmd.Flags().StringVarP(&_licensemanagerlinuxsubscriptionsAllowUpdate, "allow-update", "", "", "Allow Update")
 	_licensemanagerlinuxsubscriptionsCmd.Flags().StringVarP(&_licensemanagerlinuxsubscriptionsFilters, "filters", "", "", "Filters")

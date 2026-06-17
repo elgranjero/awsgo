@@ -14,6 +14,7 @@ var _cloud9Cmd = &cobra.Command{
 	Use:   "cloud9",
 	Short: "AWS cloud9 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -564,10 +565,10 @@ func init() {
 	_rootCmd.AddCommand(_cloud9Cmd)
 	_cloud9Cmd.Flags().SortFlags = false
 
-	_cloud9Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_cloud9Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_cloud9Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_cloud9Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_cloud9Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_cloud9Cmd.Flags().StringVarP(&_cloud9AutomaticStopTimeMinutes, "automatic-stop-time-minutes", "", "", "Automatic Stop Time Minutes")
 	_cloud9Cmd.Flags().StringVarP(&_cloud9ClientRequestToken, "client-request-token", "", "", "Client Request Token")

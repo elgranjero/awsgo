@@ -14,6 +14,7 @@ var _ssoCmd = &cobra.Command{
 	Use:   "sso",
 	Short: "AWS sso CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -212,10 +213,10 @@ func init() {
 	_rootCmd.AddCommand(_ssoCmd)
 	_ssoCmd.Flags().SortFlags = false
 
-	_ssoCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ssoCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ssoCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ssoCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ssoCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ssoCmd.Flags().StringVarP(&_ssoAccessToken, "access-token", "", "", "Access Token")
 	_ssoCmd.Flags().StringVarP(&_ssoAccountId, "account-id", "", "", "Account ID")

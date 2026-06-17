@@ -14,6 +14,7 @@ var _personalizeCmd = &cobra.Command{
 	Use:   "personalize",
 	Short: "AWS personalize CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3276,10 +3277,10 @@ func init() {
 	_rootCmd.AddCommand(_personalizeCmd)
 	_personalizeCmd.Flags().SortFlags = false
 
-	_personalizeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_personalizeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_personalizeCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_personalizeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_personalizeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_personalizeCmd.Flags().StringVarP(&_personalizeAddMetrics, "add-metrics", "", "", "Add Metrics")
 	_personalizeCmd.Flags().StringVarP(&_personalizeAlgorithmArn, "algorithm-arn", "", "", "Algorithm ARN")

@@ -14,6 +14,7 @@ var _artifactCmd = &cobra.Command{
 	Use:   "artifact",
 	Short: "AWS artifact CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -304,10 +305,10 @@ func init() {
 	_rootCmd.AddCommand(_artifactCmd)
 	_artifactCmd.Flags().SortFlags = false
 
-	_artifactCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_artifactCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_artifactCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_artifactCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_artifactCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_artifactCmd.Flags().StringVarP(&_artifactMaxResults, "max-results", "", "", "Max Results")
 	_artifactCmd.Flags().StringVarP(&_artifactNextToken, "next-token", "", "", "Next Token")

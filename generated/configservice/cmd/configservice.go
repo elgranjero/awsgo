@@ -14,6 +14,7 @@ var _configserviceCmd = &cobra.Command{
 	Use:   "configservice",
 	Short: "AWS configservice CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -4804,10 +4805,10 @@ func init() {
 	_rootCmd.AddCommand(_configserviceCmd)
 	_configserviceCmd.Flags().SortFlags = false
 
-	_configserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_configserviceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_configserviceCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_configserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_configserviceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_configserviceCmd.Flags().StringVarP(&_configserviceAccountAggregationSources, "account-aggregation-sources", "", "", "Account Aggregation Sources")
 	_configserviceCmd.Flags().StringVarP(&_configserviceAccountId, "account-id", "", "", "Account ID")

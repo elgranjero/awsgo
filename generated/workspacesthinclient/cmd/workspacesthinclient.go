@@ -14,6 +14,7 @@ var _workspacesthinclientCmd = &cobra.Command{
 	Use:   "workspacesthinclient",
 	Short: "AWS workspacesthinclient CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -604,10 +605,10 @@ func init() {
 	_rootCmd.AddCommand(_workspacesthinclientCmd)
 	_workspacesthinclientCmd.Flags().SortFlags = false
 
-	_workspacesthinclientCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_workspacesthinclientCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_workspacesthinclientCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_workspacesthinclientCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_workspacesthinclientCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_workspacesthinclientCmd.Flags().StringVarP(&_workspacesthinclientClientToken, "client-token", "", "", "Client Token")
 	_workspacesthinclientCmd.Flags().StringVarP(&_workspacesthinclientDesiredSoftwareSetId, "desired-software-set-id", "", "", "Desired Software Set ID")

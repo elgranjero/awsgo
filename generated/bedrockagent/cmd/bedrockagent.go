@@ -14,6 +14,7 @@ var _bedrockagentCmd = &cobra.Command{
 	Use:   "bedrockagent",
 	Short: "AWS bedrockagent CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3163,10 +3164,10 @@ func init() {
 	_rootCmd.AddCommand(_bedrockagentCmd)
 	_bedrockagentCmd.Flags().SortFlags = false
 
-	_bedrockagentCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_bedrockagentCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_bedrockagentCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_bedrockagentCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_bedrockagentCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_bedrockagentCmd.Flags().StringVarP(&_bedrockagentActionGroupExecutor, "action-group-executor", "", "", "Action Group Executor")
 	_bedrockagentCmd.Flags().StringVarP(&_bedrockagentActionGroupId, "action-group-id", "", "", "Action Group ID")

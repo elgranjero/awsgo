@@ -14,6 +14,7 @@ var _ecrCmd = &cobra.Command{
 	Use:   "ecr",
 	Short: "AWS ecr CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2209,10 +2210,10 @@ func init() {
 	_rootCmd.AddCommand(_ecrCmd)
 	_ecrCmd.Flags().SortFlags = false
 
-	_ecrCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ecrCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ecrCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ecrCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ecrCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ecrCmd.Flags().StringSliceVarP(&_ecrAcceptedMediaTypes, "accepted-media-types", "", nil, "Accepted Media Types")
 	_ecrCmd.Flags().StringVarP(&_ecrAppliedFor, "applied-for", "", "", "Applied For")

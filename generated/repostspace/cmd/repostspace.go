@@ -14,6 +14,7 @@ var _repostspaceCmd = &cobra.Command{
 	Use:   "repostspace",
 	Short: "AWS repostspace CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -702,10 +703,10 @@ func init() {
 	_rootCmd.AddCommand(_repostspaceCmd)
 	_repostspaceCmd.Flags().SortFlags = false
 
-	_repostspaceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_repostspaceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_repostspaceCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_repostspaceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_repostspaceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_repostspaceCmd.Flags().StringSliceVarP(&_repostspaceAccessorIds, "accessor-ids", "", nil, "Accessor Ids")
 	_repostspaceCmd.Flags().StringVarP(&_repostspaceAdminId, "admin-id", "", "", "Admin ID")

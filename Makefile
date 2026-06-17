@@ -9,17 +9,22 @@ GOMODCACHE ?= $(CACHE_ROOT)/.gomodcache
 GO := GOCACHE=$(GOCACHE) GOMODCACHE=$(GOMODCACHE) go
 BIN_DIR ?= $(ROOT)/bin
 SERVICE_BIN_DIR ?= $(BIN_DIR)/awsgo-services
+DISPATCHER_BIN ?= $(BIN_DIR)/awsgo
+MONOLITH_BIN ?= $(BIN_DIR)/awsgo-monolith
 SDK_ROOT ?= $(HOME_DIR)/git/aws-sdk-go-v2/service
 OUT_ROOT ?= $(ROOT)/generated
 JOBS ?= 16
-SPLIT_SERVICES ?= sts iam ec2 s3 cloudwatch rds
+SERVICE_FIND = find awsgo/services -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort
+SPLIT_SERVICES ?= all
+SPLIT_BUILD_JOBS ?= 2
+SPLIT_GOMAXPROCS ?= 1
 SAFE_JOBS ?= 4
 SAFE_PROCS ?= 2
 SAFE_TEST_P ?= 2
 SAFE_TEST_TIMEOUT ?= 45m
 SAFE_LIVE_TIMEOUT ?= 2h
 
-.PHONY: help regen regen-service regen-safe gen fmt goimports install-tools tidy build build-monolith build-dispatcher build-service build-split build-safe test test-safe test-parity-offline test-parity-offline-safe test-parity-live test-parity-live-safe parity-safe clean clean-cache check all
+.PHONY: help list-services regen regen-service regen-safe gen fmt goimports install-tools tidy build build-monolith build-dispatcher build-service build-service-bin build-split build-split-all build-safe test test-safe test-parity-offline test-parity-offline-safe test-parity-live test-parity-live-safe parity-safe clean clean-cache check all
 
 help:
 	@echo "Targets:"
@@ -30,9 +35,12 @@ help:
 	@echo "  tidy          Run go mod tidy"
 	@echo "  fmt           Run gofmt"
 	@echo "  goimports     Run goimports"
-	@echo "  build         Build monolithic awsgo binary"
-	@echo "  build-split   Build split dispatcher + selected services (SPLIT_SERVICES=\"ec2 s3\")"
+	@echo "  build         Build split awsgo dispatcher + all service binaries"
+	@echo "  build-monolith Build legacy monolithic binary at bin/awsgo-monolith"
+	@echo "  build-split   Build split dispatcher + services (default SPLIT_SERVICES=all)"
+	@echo "  build-split-all Build split dispatcher + every service binary"
 	@echo "  build-service Build one service binary (SERVICE=ec2)"
+	@echo "  list-services Print all split service names"
 	@echo "  test          Run tests under ./tests"
 	@echo "  test-parity-offline Run offline CLI parity tests"
 	@echo "  test-parity-live    Run live AWS parity tests (opt-in)"
@@ -42,6 +50,9 @@ help:
 	@echo "  clean-cache   Remove local Go build/module caches"
 	@echo "  check         Regen + gen + tidy + fmt + goimports + build + test"
 	@echo "  all           Alias for check"
+
+list-services:
+	@$(SERVICE_FIND)
 
 regen:
 	cd $(ROOT) && $(GO) run ./servicegen.go \
@@ -81,31 +92,39 @@ goimports:
 	fi
 	cd $(ROOT) && $${GOIMPORTS:-$$(command -v goimports)} -w $$(find awsgo generated tests -type f -name '*.go' | sort)
 
-build: build-monolith
+build: build-split
 
 build-monolith: gen
 	mkdir -p $(BIN_DIR)
-	cd $(ROOT) && $(GO) build -o $(BIN_DIR)/awsgo ./awsgo
+	cd $(ROOT) && $(GO) build -o $(MONOLITH_BIN) ./awsgo
 
 build-dispatcher: gen
 	mkdir -p $(BIN_DIR)
-	cd $(ROOT) && $(GO) build -o $(BIN_DIR)/awsgo-split ./awsgo/dispatcher
+	cd $(ROOT) && $(GO) build -o $(DISPATCHER_BIN) ./awsgo/dispatcher
 
 build-service: gen
+	$(MAKE) build-service-bin SERVICE="$(SERVICE)"
+
+build-service-bin:
 	test -n "$(SERVICE)"
 	mkdir -p $(SERVICE_BIN_DIR)
-	cd $(ROOT) && $(GO) build -o $(SERVICE_BIN_DIR)/awsgo-$(SERVICE) ./awsgo/services/$(SERVICE)
+	cd $(ROOT) && GOMAXPROCS=$(SPLIT_GOMAXPROCS) $(GO) build -o $(SERVICE_BIN_DIR)/awsgo-$(SERVICE) ./awsgo/services/$(SERVICE)
 
 build-split: build-dispatcher
 	mkdir -p $(SERVICE_BIN_DIR)
-	@for svc in $(SPLIT_SERVICES); do \
-		echo "building split service $$svc"; \
-		(cd $(ROOT) && $(GO) build -o $(SERVICE_BIN_DIR)/awsgo-$$svc ./awsgo/services/$$svc) || exit $$?; \
-	done
+	@test -n "$(SPLIT_SERVICES)"
+	@if [ "$(SPLIT_SERVICES)" = "all" ]; then \
+		$(SERVICE_FIND); \
+	else \
+		printf '%s\n' $(SPLIT_SERVICES); \
+	fi | xargs -I{} -P $(SPLIT_BUILD_JOBS) $(MAKE) --no-print-directory build-service-bin SERVICE={}
+
+build-split-all:
+	$(MAKE) build-split SPLIT_SERVICES=all
 
 build-safe: gen
 	mkdir -p $(BIN_DIR)
-	cd $(ROOT) && GOMAXPROCS=$(SAFE_PROCS) $(GO) build -o $(BIN_DIR)/awsgo ./awsgo
+	cd $(ROOT) && GOMAXPROCS=$(SAFE_PROCS) $(GO) build -o $(DISPATCHER_BIN) ./awsgo/dispatcher
 
 test:
 	cd $(ROOT) && $(GO) test ./tests/...

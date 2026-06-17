@@ -14,6 +14,7 @@ var _cloudtraildataCmd = &cobra.Command{
 	Use:   "cloudtraildata",
 	Short: "AWS cloudtraildata CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -74,10 +75,10 @@ func init() {
 	_rootCmd.AddCommand(_cloudtraildataCmd)
 	_cloudtraildataCmd.Flags().SortFlags = false
 
-	_cloudtraildataCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_cloudtraildataCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_cloudtraildataCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_cloudtraildataCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_cloudtraildataCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_cloudtraildataCmd.Flags().StringVarP(&_cloudtraildataAuditEvents, "audit-events", "", "", "Audit Events")
 	_cloudtraildataCmd.Flags().StringVarP(&_cloudtraildataChannelArn, "channel-arn", "", "", "Channel ARN")

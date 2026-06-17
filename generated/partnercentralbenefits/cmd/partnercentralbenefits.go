@@ -14,6 +14,7 @@ var _partnercentralbenefitsCmd = &cobra.Command{
 	Use:   "partnercentralbenefits",
 	Short: "AWS partnercentralbenefits CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -770,10 +771,10 @@ func init() {
 	_rootCmd.AddCommand(_partnercentralbenefitsCmd)
 	_partnercentralbenefitsCmd.Flags().SortFlags = false
 
-	_partnercentralbenefitsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_partnercentralbenefitsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_partnercentralbenefitsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_partnercentralbenefitsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_partnercentralbenefitsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_partnercentralbenefitsCmd.Flags().StringVarP(&_partnercentralbenefitsAmendmentReason, "amendment-reason", "", "", "Amendment Reason")
 	_partnercentralbenefitsCmd.Flags().StringVarP(&_partnercentralbenefitsAmendments, "amendments", "", "", "Amendments")

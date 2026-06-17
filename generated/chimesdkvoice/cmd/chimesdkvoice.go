@@ -14,6 +14,7 @@ var _chimesdkvoiceCmd = &cobra.Command{
 	Use:   "chimesdkvoice",
 	Short: "AWS chimesdkvoice CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3194,10 +3195,10 @@ func init() {
 	_rootCmd.AddCommand(_chimesdkvoiceCmd)
 	_chimesdkvoiceCmd.Flags().SortFlags = false
 
-	_chimesdkvoiceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_chimesdkvoiceCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_chimesdkvoiceCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_chimesdkvoiceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_chimesdkvoiceCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_chimesdkvoiceCmd.Flags().StringVarP(&_chimesdkvoiceAreaCode, "area-code", "", "", "Area Code")
 	_chimesdkvoiceCmd.Flags().StringVarP(&_chimesdkvoiceArguments, "arguments", "", "", "Arguments")

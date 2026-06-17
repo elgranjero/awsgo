@@ -14,6 +14,7 @@ var _healthlakeCmd = &cobra.Command{
 	Use:   "healthlake",
 	Short: "AWS healthlake CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -574,10 +575,10 @@ func init() {
 	_rootCmd.AddCommand(_healthlakeCmd)
 	_healthlakeCmd.Flags().SortFlags = false
 
-	_healthlakeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_healthlakeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_healthlakeCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_healthlakeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_healthlakeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_healthlakeCmd.Flags().StringVarP(&_healthlakeClientToken, "client-token", "", "", "Client Token")
 	_healthlakeCmd.Flags().StringVarP(&_healthlakeDataAccessRoleArn, "data-access-role-arn", "", "", "Data Access Role ARN")

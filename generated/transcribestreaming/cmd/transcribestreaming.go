@@ -14,6 +14,7 @@ var _transcribestreamingCmd = &cobra.Command{
 	Use:   "transcribestreaming",
 	Short: "AWS transcribestreaming CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -530,10 +531,10 @@ func init() {
 	_rootCmd.AddCommand(_transcribestreamingCmd)
 	_transcribestreamingCmd.Flags().SortFlags = false
 
-	_transcribestreamingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_transcribestreamingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_transcribestreamingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_transcribestreamingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_transcribestreamingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_transcribestreamingCmd.Flags().StringVarP(&_transcribestreamingContentIdentificationType, "content-identification-type", "", "", "Content Identification Type")
 	_transcribestreamingCmd.Flags().StringVarP(&_transcribestreamingContentRedactionType, "content-redaction-type", "", "", "Content Redaction Type")

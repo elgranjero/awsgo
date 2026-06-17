@@ -14,6 +14,7 @@ var _forecastqueryCmd = &cobra.Command{
 	Use:   "forecastquery",
 	Short: "AWS forecastquery CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -132,10 +133,10 @@ func init() {
 	_rootCmd.AddCommand(_forecastqueryCmd)
 	_forecastqueryCmd.Flags().SortFlags = false
 
-	_forecastqueryCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_forecastqueryCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_forecastqueryCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_forecastqueryCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_forecastqueryCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_forecastqueryCmd.Flags().StringVarP(&_forecastqueryEndDate, "end-date", "", "", "End Date")
 	_forecastqueryCmd.Flags().StringVarP(&_forecastqueryFilters, "filters", "", "", "Filters")

@@ -14,6 +14,7 @@ var _inspectorscanCmd = &cobra.Command{
 	Use:   "inspectorscan",
 	Short: "AWS inspectorscan CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -78,10 +79,10 @@ func init() {
 	_rootCmd.AddCommand(_inspectorscanCmd)
 	_inspectorscanCmd.Flags().SortFlags = false
 
-	_inspectorscanCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_inspectorscanCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_inspectorscanCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_inspectorscanCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_inspectorscanCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_inspectorscanCmd.Flags().StringVarP(&_inspectorscanOutputFormat, "output-format", "", "", "Output Format")
 	_inspectorscanCmd.Flags().StringVarP(&_inspectorscanSbom, "sbom", "", "", "Sbom")

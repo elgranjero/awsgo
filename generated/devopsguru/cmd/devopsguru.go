@@ -14,6 +14,7 @@ var _devopsguruCmd = &cobra.Command{
 	Use:   "devopsguru",
 	Short: "AWS devopsguru CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1284,10 +1285,10 @@ func init() {
 	_rootCmd.AddCommand(_devopsguruCmd)
 	_devopsguruCmd.Flags().SortFlags = false
 
-	_devopsguruCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_devopsguruCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_devopsguruCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_devopsguruCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_devopsguruCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_devopsguruCmd.Flags().StringVarP(&_devopsguruAccountId, "account-id", "", "", "Account ID")
 	_devopsguruCmd.Flags().StringSliceVarP(&_devopsguruAccountIds, "account-ids", "", nil, "Account Ids")

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -33,8 +34,10 @@ func runServiceOperation(service, operation string, passthrough []string) error 
 		return nil
 	}
 
+	effectiveOutput := resolveOutputFormat(awsProfile, outputSet || rootCmd.PersistentFlags().Changed("output"))
 	args := make([]string, 0, len(passthrough)+5)
 	args = append(args, "--"+operation)
+	args = append(args, "--output", "json")
 	if awsProfile != "" && !hasLongFlag(passthrough, "profile") {
 		args = append(args, "--profile", awsProfile)
 	}
@@ -73,7 +76,7 @@ func runServiceOperation(service, operation string, passthrough []string) error 
 		return err
 	}
 
-	formatted, err := formatOutput(queried, outputFormat)
+	formatted, err := formatOutput(queried, effectiveOutput)
 	if err != nil {
 		return err
 	}
@@ -114,6 +117,73 @@ func hasHelpFlag(args []string) bool {
 	return false
 }
 
+func resolveOutputFormat(profile string, explicit bool) string {
+	if explicit {
+		if v := strings.TrimSpace(outputFormat); v != "" {
+			return v
+		}
+	}
+	if v := strings.TrimSpace(os.Getenv("AWS_DEFAULT_OUTPUT")); v != "" {
+		return v
+	}
+	if v := sharedConfigProfileOutput(profile); v != "" {
+		return v
+	}
+	return "json"
+}
+
+func sharedConfigProfileOutput(profile string) string {
+	profile = strings.TrimSpace(profile)
+	if profile == "" {
+		profile = strings.TrimSpace(os.Getenv("AWS_PROFILE"))
+	}
+	if profile == "" {
+		profile = "default"
+	}
+
+	sectionName := "default"
+	if profile != "default" {
+		sectionName = "profile " + profile
+	}
+
+	configPath := strings.TrimSpace(os.Getenv("AWS_CONFIG_FILE"))
+	if configPath == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return ""
+		}
+		configPath = filepath.Join(home, ".aws", "config")
+	}
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return ""
+	}
+
+	currentSection := ""
+	for _, rawLine := range strings.Split(string(data), "\n") {
+		line := strings.TrimSpace(rawLine)
+		if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, ";") {
+			continue
+		}
+		if strings.HasPrefix(line, "[") {
+			if end := strings.Index(line, "]"); end >= 0 {
+				currentSection = strings.TrimSpace(line[1:end])
+			}
+			continue
+		}
+		if currentSection != sectionName {
+			continue
+		}
+		key, value, ok := strings.Cut(line, "=")
+		if !ok || strings.TrimSpace(key) != "output" {
+			continue
+		}
+		return strings.Trim(strings.TrimSpace(value), "\"'")
+	}
+	return ""
+}
+
 func consumeGlobalFlags(args []string) []string {
 	kept := make([]string, 0, len(args))
 	for i := 0; i < len(args); i++ {
@@ -141,10 +211,12 @@ func consumeGlobalFlags(args []string) []string {
 		case arg == "--output":
 			if i+1 < len(args) {
 				outputFormat = args[i+1]
+				outputSet = true
 				i++
 			}
 		case strings.HasPrefix(arg, "--output="):
 			outputFormat = strings.TrimPrefix(arg, "--output=")
+			outputSet = true
 		case arg == "--query":
 			if i+1 < len(args) {
 				queryExpr = args[i+1]

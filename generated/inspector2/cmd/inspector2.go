@@ -14,6 +14,7 @@ var _inspector2Cmd = &cobra.Command{
 	Use:   "inspector2",
 	Short: "AWS inspector2 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2699,10 +2700,10 @@ func init() {
 	_rootCmd.AddCommand(_inspector2Cmd)
 	_inspector2Cmd.Flags().SortFlags = false
 
-	_inspector2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_inspector2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_inspector2Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_inspector2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_inspector2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_inspector2Cmd.Flags().StringVarP(&_inspector2AccountId, "account-id", "", "", "Account ID")
 	_inspector2Cmd.Flags().StringSliceVarP(&_inspector2AccountIds, "account-ids", "", nil, "Account Ids")

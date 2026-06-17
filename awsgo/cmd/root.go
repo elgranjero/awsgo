@@ -22,6 +22,7 @@ var (
 	verbose      bool
 	inputJSON    string
 	inputFile    string
+	outputSet    bool
 )
 
 func Execute() error {
@@ -29,7 +30,7 @@ func Execute() error {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&outputFormat, "output", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	rootCmd.PersistentFlags().StringVar(&outputFormat, "output", "", "Output format: json|yaml|text|table|csv|markdown|html")
 	rootCmd.PersistentFlags().StringVar(&awsProfile, "profile", "", "AWS shared config profile")
 	rootCmd.PersistentFlags().StringVar(&awsRegion, "region", "", "AWS region")
 	rootCmd.PersistentFlags().StringVar(&queryExpr, "query", "", "Apply a JMESPath query to JSON output")

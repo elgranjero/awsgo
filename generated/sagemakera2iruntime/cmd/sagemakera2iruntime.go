@@ -14,6 +14,7 @@ var _sagemakera2iruntimeCmd = &cobra.Command{
 	Use:   "sagemakera2iruntime",
 	Short: "AWS sagemakera2iruntime CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -222,10 +223,10 @@ func init() {
 	_rootCmd.AddCommand(_sagemakera2iruntimeCmd)
 	_sagemakera2iruntimeCmd.Flags().SortFlags = false
 
-	_sagemakera2iruntimeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_sagemakera2iruntimeCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_sagemakera2iruntimeCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_sagemakera2iruntimeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_sagemakera2iruntimeCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_sagemakera2iruntimeCmd.Flags().StringVarP(&_sagemakera2iruntimeCreationTimeAfter, "creation-time-after", "", "", "Creation Time After")
 	_sagemakera2iruntimeCmd.Flags().StringVarP(&_sagemakera2iruntimeCreationTimeBefore, "creation-time-before", "", "", "Creation Time Before")

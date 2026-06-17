@@ -14,6 +14,7 @@ var _cleanroomsCmd = &cobra.Command{
 	Use:   "cleanrooms",
 	Short: "AWS cleanrooms CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3475,10 +3476,10 @@ func init() {
 	_rootCmd.AddCommand(_cleanroomsCmd)
 	_cleanroomsCmd.Flags().SortFlags = false
 
-	_cleanroomsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_cleanroomsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_cleanroomsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_cleanroomsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_cleanroomsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_cleanroomsCmd.Flags().StringVarP(&_cleanroomsAccessBudgetResourceArn, "access-budget-resource-arn", "", "", "Access Budget Resource ARN")
 	_cleanroomsCmd.Flags().StringVarP(&_cleanroomsAccountId, "account-id", "", "", "Account ID")

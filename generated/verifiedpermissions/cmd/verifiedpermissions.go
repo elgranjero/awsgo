@@ -14,6 +14,7 @@ var _verifiedpermissionsCmd = &cobra.Command{
 	Use:   "verifiedpermissions",
 	Short: "AWS verifiedpermissions CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1348,10 +1349,10 @@ func init() {
 	_rootCmd.AddCommand(_verifiedpermissionsCmd)
 	_verifiedpermissionsCmd.Flags().SortFlags = false
 
-	_verifiedpermissionsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_verifiedpermissionsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_verifiedpermissionsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_verifiedpermissionsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_verifiedpermissionsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_verifiedpermissionsCmd.Flags().StringVarP(&_verifiedpermissionsAccessToken, "access-token", "", "", "Access Token")
 	_verifiedpermissionsCmd.Flags().StringVarP(&_verifiedpermissionsAction, "action", "", "", "Action")

@@ -14,6 +14,7 @@ var _wafv2Cmd = &cobra.Command{
 	Use:   "wafv2",
 	Short: "AWS wafv2 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2706,10 +2707,10 @@ func init() {
 	_rootCmd.AddCommand(_wafv2Cmd)
 	_wafv2Cmd.Flags().SortFlags = false
 
-	_wafv2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_wafv2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_wafv2Cmd.Flags().StringVarP(&_wafv2Region, "region", "r", "us-east-1", "Set AWS Region")
 
-	_wafv2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_wafv2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_wafv2Cmd.Flags().StringSliceVarP(&_wafv2Addresses, "addresses", "", nil, "Addresses")
 	_wafv2Cmd.Flags().StringVarP(&_wafv2APIKey, "api-key", "", "", "API Key")

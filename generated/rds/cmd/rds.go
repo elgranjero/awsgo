@@ -14,6 +14,7 @@ var _rdsCmd = &cobra.Command{
 	Use:   "rds",
 	Short: "AWS rds CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -10218,10 +10219,10 @@ func init() {
 	_rootCmd.AddCommand(_rdsCmd)
 	_rdsCmd.Flags().SortFlags = false
 
-	_rdsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_rdsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_rdsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_rdsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_rdsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_rdsCmd.Flags().StringVarP(&_rdsAdditionalEncryptionContext, "additional-encryption-context", "", "", "Additional Encryption Context")
 	_rdsCmd.Flags().StringVarP(&_rdsAdditionalStorageVolumes, "additional-storage-volumes", "", "", "Additional Storage Volumes")

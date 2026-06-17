@@ -14,6 +14,7 @@ var _evsCmd = &cobra.Command{
 	Use:   "evs",
 	Short: "AWS evs CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -642,10 +643,10 @@ func init() {
 	_rootCmd.AddCommand(_evsCmd)
 	_evsCmd.Flags().SortFlags = false
 
-	_evsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_evsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_evsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_evsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_evsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_evsCmd.Flags().StringVarP(&_evsAllocationId, "allocation-id", "", "", "Allocation ID")
 	_evsCmd.Flags().StringVarP(&_evsAssociationId, "association-id", "", "", "Association ID")

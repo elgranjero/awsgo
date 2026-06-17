@@ -14,6 +14,7 @@ var _elasticacheCmd = &cobra.Command{
 	Use:   "elasticache",
 	Short: "AWS elasticache CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3966,10 +3967,10 @@ func init() {
 	_rootCmd.AddCommand(_elasticacheCmd)
 	_elasticacheCmd.Flags().SortFlags = false
 
-	_elasticacheCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_elasticacheCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_elasticacheCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_elasticacheCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_elasticacheCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_elasticacheCmd.Flags().StringVarP(&_elasticacheAccessString, "access-string", "", "", "Access String")
 	_elasticacheCmd.Flags().StringVarP(&_elasticacheAppendAccessString, "append-access-string", "", "", "Append Access String")

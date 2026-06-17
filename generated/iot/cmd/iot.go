@@ -14,6 +14,7 @@ var _iotCmd = &cobra.Command{
 	Use:   "iot",
 	Short: "AWS iot CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -11560,10 +11561,10 @@ func init() {
 	_rootCmd.AddCommand(_iotCmd)
 	_iotCmd.Flags().SortFlags = false
 
-	_iotCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_iotCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_iotCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_iotCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_iotCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_iotCmd.Flags().StringVarP(&_iotAbortConfig, "abort-config", "", "", "Abort Config")
 	_iotCmd.Flags().StringVarP(&_iotAccountDefaultForOperations, "account-default-for-operations", "", "", "Account Default For Operations")

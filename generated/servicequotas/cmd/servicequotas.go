@@ -14,6 +14,7 @@ var _servicequotasCmd = &cobra.Command{
 	Use:   "servicequotas",
 	Short: "AWS servicequotas CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -965,10 +966,10 @@ func init() {
 	_rootCmd.AddCommand(_servicequotasCmd)
 	_servicequotasCmd.Flags().SortFlags = false
 
-	_servicequotasCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_servicequotasCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_servicequotasCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_servicequotasCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_servicequotasCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_servicequotasCmd.Flags().StringVarP(&_servicequotasAwsRegion, "aws-region", "", "", "AWS Region")
 	_servicequotasCmd.Flags().StringVarP(&_servicequotasContextId, "context-id", "", "", "Context ID")

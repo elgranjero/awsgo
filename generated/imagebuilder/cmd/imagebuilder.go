@@ -14,6 +14,7 @@ var _imagebuilderCmd = &cobra.Command{
 	Use:   "imagebuilder",
 	Short: "AWS imagebuilder CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3464,10 +3465,10 @@ func init() {
 	_rootCmd.AddCommand(_imagebuilderCmd)
 	_imagebuilderCmd.Flags().SortFlags = false
 
-	_imagebuilderCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_imagebuilderCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_imagebuilderCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_imagebuilderCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_imagebuilderCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_imagebuilderCmd.Flags().StringVarP(&_imagebuilderAction, "action", "", "", "Action")
 	_imagebuilderCmd.Flags().StringVarP(&_imagebuilderAdditionalInstanceConfiguration, "additional-instance-configuration", "", "", "Additional Instance Configuration")

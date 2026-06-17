@@ -14,6 +14,7 @@ var _lexruntimev2Cmd = &cobra.Command{
 	Use:   "lexruntimev2",
 	Short: "AWS lexruntimev2 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -460,10 +461,10 @@ func init() {
 	_rootCmd.AddCommand(_lexruntimev2Cmd)
 	_lexruntimev2Cmd.Flags().SortFlags = false
 
-	_lexruntimev2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_lexruntimev2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_lexruntimev2Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_lexruntimev2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_lexruntimev2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_lexruntimev2Cmd.Flags().StringVarP(&_lexruntimev2BotAliasId, "bot-alias-id", "", "", "Bot Alias ID")
 	_lexruntimev2Cmd.Flags().StringVarP(&_lexruntimev2BotId, "bot-id", "", "", "Bot ID")

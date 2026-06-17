@@ -14,6 +14,7 @@ var _workdocsCmd = &cobra.Command{
 	Use:   "workdocs",
 	Short: "AWS workdocs CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1963,10 +1964,10 @@ func init() {
 	_rootCmd.AddCommand(_workdocsCmd)
 	_workdocsCmd.Flags().SortFlags = false
 
-	_workdocsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_workdocsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_workdocsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_workdocsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_workdocsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_workdocsCmd.Flags().StringVarP(&_workdocsActivityTypes, "activity-types", "", "", "Activity Types")
 	_workdocsCmd.Flags().StringVarP(&_workdocsAdditionalResponseFields, "additional-response-fields", "", "", "Additional Response Fields")

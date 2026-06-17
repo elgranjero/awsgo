@@ -14,6 +14,7 @@ var _stsCmd = &cobra.Command{
 	Use:   "sts",
 	Short: "AWS sts CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1062,10 +1063,10 @@ func init() {
 	_rootCmd.AddCommand(_stsCmd)
 	_stsCmd.Flags().SortFlags = false
 
-	_stsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_stsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_stsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_stsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_stsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_stsCmd.Flags().StringVarP(&_stsAccessKeyId, "access-key-id", "", "", "Access Key ID")
 	_stsCmd.Flags().StringSliceVarP(&_stsAudience, "audience", "", nil, "Audience")

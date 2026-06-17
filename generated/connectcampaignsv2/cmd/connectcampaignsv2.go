@@ -14,6 +14,7 @@ var _connectcampaignsv2Cmd = &cobra.Command{
 	Use:   "connectcampaignsv2",
 	Short: "AWS connectcampaignsv2 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1093,10 +1094,10 @@ func init() {
 	_rootCmd.AddCommand(_connectcampaignsv2Cmd)
 	_connectcampaignsv2Cmd.Flags().SortFlags = false
 
-	_connectcampaignsv2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_connectcampaignsv2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_connectcampaignsv2Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_connectcampaignsv2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_connectcampaignsv2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_connectcampaignsv2Cmd.Flags().StringVarP(&_connectcampaignsv2Arn, "arn", "", "", "ARN")
 	_connectcampaignsv2Cmd.Flags().StringVarP(&_connectcampaignsv2CampaignDeletionPolicy, "campaign-deletion-policy", "", "", "Campaign Deletion Policy")

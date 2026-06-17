@@ -14,6 +14,7 @@ var _workmailCmd = &cobra.Command{
 	Use:   "workmail",
 	Short: "AWS workmail CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3564,10 +3565,10 @@ func init() {
 	_rootCmd.AddCommand(_workmailCmd)
 	_workmailCmd.Flags().SortFlags = false
 
-	_workmailCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_workmailCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_workmailCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_workmailCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_workmailCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_workmailCmd.Flags().StringVarP(&_workmailAction, "action", "", "", "Action")
 	_workmailCmd.Flags().StringSliceVarP(&_workmailActions, "actions", "", nil, "Actions")

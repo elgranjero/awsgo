@@ -14,6 +14,7 @@ var _invoicingCmd = &cobra.Command{
 	Use:   "invoicing",
 	Short: "AWS invoicing CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -760,10 +761,10 @@ func init() {
 	_rootCmd.AddCommand(_invoicingCmd)
 	_invoicingCmd.Flags().SortFlags = false
 
-	_invoicingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_invoicingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_invoicingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_invoicingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_invoicingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_invoicingCmd.Flags().StringSliceVarP(&_invoicingAccountIds, "account-ids", "", nil, "Account Ids")
 	_invoicingCmd.Flags().StringVarP(&_invoicingAsOf, "as-of", "", "", "As Of")

@@ -14,6 +14,7 @@ var _ssooidcCmd = &cobra.Command{
 	Use:   "ssooidc",
 	Short: "AWS ssooidc CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -250,10 +251,10 @@ func init() {
 	_rootCmd.AddCommand(_ssooidcCmd)
 	_ssooidcCmd.Flags().SortFlags = false
 
-	_ssooidcCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ssooidcCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ssooidcCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ssooidcCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ssooidcCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ssooidcCmd.Flags().StringVarP(&_ssooidcAssertion, "assertion", "", "", "Assertion")
 	_ssooidcCmd.Flags().StringVarP(&_ssooidcClientId, "client-id", "", "", "Client ID")

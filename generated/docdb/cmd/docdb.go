@@ -14,6 +14,7 @@ var _docdbCmd = &cobra.Command{
 	Use:   "docdb",
 	Short: "AWS docdb CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2732,10 +2733,10 @@ func init() {
 	_rootCmd.AddCommand(_docdbCmd)
 	_docdbCmd.Flags().SortFlags = false
 
-	_docdbCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_docdbCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_docdbCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_docdbCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_docdbCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_docdbCmd.Flags().StringVarP(&_docdbAllowDataLoss, "allow-data-loss", "", "", "Allow Data Loss")
 	_docdbCmd.Flags().StringVarP(&_docdbAllowMajorVersionUpgrade, "allow-major-version-upgrade", "", "", "Allow Major Version Upgrade")

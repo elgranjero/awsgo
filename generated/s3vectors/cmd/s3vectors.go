@@ -14,6 +14,7 @@ var _s3vectorsCmd = &cobra.Command{
 	Use:   "s3vectors",
 	Short: "AWS s3vectors CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -917,10 +918,10 @@ func init() {
 	_rootCmd.AddCommand(_s3vectorsCmd)
 	_s3vectorsCmd.Flags().SortFlags = false
 
-	_s3vectorsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_s3vectorsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_s3vectorsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_s3vectorsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_s3vectorsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_s3vectorsCmd.Flags().StringVarP(&_s3vectorsDataType, "data-type", "", "", "Data Type")
 	_s3vectorsCmd.Flags().StringVarP(&_s3vectorsDimension, "dimension", "", "", "Dimension")

@@ -14,6 +14,7 @@ var _locationCmd = &cobra.Command{
 	Use:   "location",
 	Short: "AWS location CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3162,10 +3163,10 @@ func init() {
 	_rootCmd.AddCommand(_locationCmd)
 	_locationCmd.Flags().SortFlags = false
 
-	_locationCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_locationCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_locationCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_locationCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_locationCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_locationCmd.Flags().StringVarP(&_locationArrivalTime, "arrival-time", "", "", "Arrival Time")
 	_locationCmd.Flags().StringVarP(&_locationBiasPosition, "bias-position", "", "", "Bias Position")

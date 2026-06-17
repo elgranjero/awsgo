@@ -14,6 +14,7 @@ var _firehoseCmd = &cobra.Command{
 	Use:   "firehose",
 	Short: "AWS firehose CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -918,10 +919,10 @@ func init() {
 	_rootCmd.AddCommand(_firehoseCmd)
 	_firehoseCmd.Flags().SortFlags = false
 
-	_firehoseCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_firehoseCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_firehoseCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_firehoseCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_firehoseCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_firehoseCmd.Flags().StringVarP(&_firehoseAllowForceDelete, "allow-force-delete", "", "", "Allow Force Delete")
 	_firehoseCmd.Flags().StringVarP(&_firehoseAmazonOpenSearchServerlessDestinationConfiguration, "amazon-open-search-serverless-destination-configuration", "", "", "Amazon Open Search Serverless Destination Configuration")

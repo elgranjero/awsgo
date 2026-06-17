@@ -14,6 +14,7 @@ var _ssmguiconnectCmd = &cobra.Command{
 	Use:   "ssmguiconnect",
 	Short: "AWS ssmguiconnect CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -105,10 +106,10 @@ func init() {
 	_rootCmd.AddCommand(_ssmguiconnectCmd)
 	_ssmguiconnectCmd.Flags().SortFlags = false
 
-	_ssmguiconnectCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ssmguiconnectCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ssmguiconnectCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ssmguiconnectCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ssmguiconnectCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ssmguiconnectCmd.Flags().StringVarP(&_ssmguiconnectClientToken, "client-token", "", "", "Client Token")
 	_ssmguiconnectCmd.Flags().StringVarP(&_ssmguiconnectConnectionRecordingPreferences, "connection-recording-preferences", "", "", "Connection Recording Preferences")

@@ -14,6 +14,7 @@ var _gameliftstreamsCmd = &cobra.Command{
 	Use:   "gameliftstreams",
 	Short: "AWS gameliftstreams CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1306,10 +1307,10 @@ func init() {
 	_rootCmd.AddCommand(_gameliftstreamsCmd)
 	_gameliftstreamsCmd.Flags().SortFlags = false
 
-	_gameliftstreamsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_gameliftstreamsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_gameliftstreamsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_gameliftstreamsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_gameliftstreamsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_gameliftstreamsCmd.Flags().StringVarP(&_gameliftstreamsAdditionalEnvironmentVariables, "additional-environment-variables", "", "", "Additional Environment Variables")
 	_gameliftstreamsCmd.Flags().StringSliceVarP(&_gameliftstreamsAdditionalLaunchArgs, "additional-launch-args", "", nil, "Additional Launch Args")

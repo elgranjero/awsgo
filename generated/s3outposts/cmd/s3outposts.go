@@ -14,6 +14,7 @@ var _s3outpostsCmd = &cobra.Command{
 	Use:   "s3outposts",
 	Short: "AWS s3outposts CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -281,10 +282,10 @@ func init() {
 	_rootCmd.AddCommand(_s3outpostsCmd)
 	_s3outpostsCmd.Flags().SortFlags = false
 
-	_s3outpostsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_s3outpostsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_s3outpostsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_s3outpostsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_s3outpostsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_s3outpostsCmd.Flags().StringVarP(&_s3outpostsAccessType, "access-type", "", "", "Access Type")
 	_s3outpostsCmd.Flags().StringVarP(&_s3outpostsCustomerOwnedIpv4Pool, "customer-owned-ipv4-pool", "", "", "Customer Owned IPV4 Pool")

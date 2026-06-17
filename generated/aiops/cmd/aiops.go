@@ -14,6 +14,7 @@ var _aiopsCmd = &cobra.Command{
 	Use:   "aiops",
 	Short: "AWS aiops CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -470,10 +471,10 @@ func init() {
 	_rootCmd.AddCommand(_aiopsCmd)
 	_aiopsCmd.Flags().SortFlags = false
 
-	_aiopsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_aiopsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_aiopsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_aiopsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_aiopsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_aiopsCmd.Flags().StringVarP(&_aiopsChatbotNotificationChannel, "chatbot-notification-channel", "", "", "Chatbot Notification Channel")
 	_aiopsCmd.Flags().StringVarP(&_aiopsCrossAccountConfigurations, "cross-account-configurations", "", "", "Cross Account Configurations")

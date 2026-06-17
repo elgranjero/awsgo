@@ -14,6 +14,7 @@ var _pcaconnectoradCmd = &cobra.Command{
 	Use:   "pcaconnectorad",
 	Short: "AWS pcaconnectorad CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -893,10 +894,10 @@ func init() {
 	_rootCmd.AddCommand(_pcaconnectoradCmd)
 	_pcaconnectoradCmd.Flags().SortFlags = false
 
-	_pcaconnectoradCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_pcaconnectoradCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_pcaconnectoradCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_pcaconnectoradCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_pcaconnectoradCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_pcaconnectoradCmd.Flags().StringVarP(&_pcaconnectoradAccessRights, "access-rights", "", "", "Access Rights")
 	_pcaconnectoradCmd.Flags().StringVarP(&_pcaconnectoradCertificateAuthorityArn, "certificate-authority-arn", "", "", "Certificate Authority ARN")

@@ -14,6 +14,7 @@ var _quicksightCmd = &cobra.Command{
 	Use:   "quicksight",
 	Short: "AWS quicksight CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -10104,10 +10105,10 @@ func init() {
 	_rootCmd.AddCommand(_quicksightCmd)
 	_quicksightCmd.Flags().SortFlags = false
 
-	_quicksightCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_quicksightCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_quicksightCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_quicksightCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_quicksightCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_quicksightCmd.Flags().StringVarP(&_quicksightAccountCustomization, "account-customization", "", "", "Account Customization")
 	_quicksightCmd.Flags().StringVarP(&_quicksightAccountName, "account-name", "", "", "Account Name")

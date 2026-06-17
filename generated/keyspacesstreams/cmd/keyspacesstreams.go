@@ -14,6 +14,7 @@ var _keyspacesstreamsCmd = &cobra.Command{
 	Use:   "keyspacesstreams",
 	Short: "AWS keyspacesstreams CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -228,10 +229,10 @@ func init() {
 	_rootCmd.AddCommand(_keyspacesstreamsCmd)
 	_keyspacesstreamsCmd.Flags().SortFlags = false
 
-	_keyspacesstreamsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_keyspacesstreamsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_keyspacesstreamsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_keyspacesstreamsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_keyspacesstreamsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_keyspacesstreamsCmd.Flags().StringVarP(&_keyspacesstreamsKeyspaceName, "keyspace-name", "", "", "Keyspace Name")
 	_keyspacesstreamsCmd.Flags().StringVarP(&_keyspacesstreamsMaxResults, "max-results", "", "", "Max Results")

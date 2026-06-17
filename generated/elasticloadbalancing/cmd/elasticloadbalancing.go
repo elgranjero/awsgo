@@ -14,6 +14,7 @@ var _elasticloadbalancingCmd = &cobra.Command{
 	Use:   "elasticloadbalancing",
 	Short: "AWS elasticloadbalancing CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -1145,10 +1146,10 @@ func init() {
 	_rootCmd.AddCommand(_elasticloadbalancingCmd)
 	_elasticloadbalancingCmd.Flags().SortFlags = false
 
-	_elasticloadbalancingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_elasticloadbalancingCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_elasticloadbalancingCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_elasticloadbalancingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_elasticloadbalancingCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_elasticloadbalancingCmd.Flags().StringSliceVarP(&_elasticloadbalancingAvailabilityZones, "availability-zones", "", nil, "Availability Zones")
 	_elasticloadbalancingCmd.Flags().StringVarP(&_elasticloadbalancingCookieExpirationPeriod, "cookie-expiration-period", "", "", "Cookie Expiration Period")

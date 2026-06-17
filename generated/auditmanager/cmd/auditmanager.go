@@ -14,6 +14,7 @@ var _auditmanagerCmd = &cobra.Command{
 	Use:   "auditmanager",
 	Short: "AWS auditmanager CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2469,10 +2470,10 @@ func init() {
 	_rootCmd.AddCommand(_auditmanagerCmd)
 	_auditmanagerCmd.Flags().SortFlags = false
 
-	_auditmanagerCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_auditmanagerCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_auditmanagerCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_auditmanagerCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_auditmanagerCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_auditmanagerCmd.Flags().StringVarP(&_auditmanagerAction, "action", "", "", "Action")
 	_auditmanagerCmd.Flags().StringVarP(&_auditmanagerActionPlanInstructions, "action-plan-instructions", "", "", "Action Plan Instructions")

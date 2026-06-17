@@ -14,6 +14,7 @@ var _taxsettingsCmd = &cobra.Command{
 	Use:   "taxsettings",
 	Short: "AWS taxsettings CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -844,10 +845,10 @@ func init() {
 	_rootCmd.AddCommand(_taxsettingsCmd)
 	_taxsettingsCmd.Flags().SortFlags = false
 
-	_taxsettingsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_taxsettingsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_taxsettingsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_taxsettingsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_taxsettingsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_taxsettingsCmd.Flags().StringVarP(&_taxsettingsAccountId, "account-id", "", "", "Account ID")
 	_taxsettingsCmd.Flags().StringSliceVarP(&_taxsettingsAccountIds, "account-ids", "", nil, "Account Ids")

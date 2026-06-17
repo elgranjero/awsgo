@@ -14,6 +14,7 @@ var _kinesisvideomediaCmd = &cobra.Command{
 	Use:   "kinesisvideomedia",
 	Short: "AWS kinesisvideomedia CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -110,10 +111,10 @@ func init() {
 	_rootCmd.AddCommand(_kinesisvideomediaCmd)
 	_kinesisvideomediaCmd.Flags().SortFlags = false
 
-	_kinesisvideomediaCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_kinesisvideomediaCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_kinesisvideomediaCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_kinesisvideomediaCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_kinesisvideomediaCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_kinesisvideomediaCmd.Flags().StringVarP(&_kinesisvideomediaStartSelector, "start-selector", "", "", "Start Selector")
 	_kinesisvideomediaCmd.Flags().StringVarP(&_kinesisvideomediaStreamARN, "stream-arn", "", "", "Stream ARN")

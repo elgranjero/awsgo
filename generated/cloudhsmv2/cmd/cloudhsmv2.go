@@ -14,6 +14,7 @@ var _cloudhsmv2Cmd = &cobra.Command{
 	Use:   "cloudhsmv2",
 	Short: "AWS cloudhsmv2 CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -751,10 +752,10 @@ func init() {
 	_rootCmd.AddCommand(_cloudhsmv2Cmd)
 	_cloudhsmv2Cmd.Flags().SortFlags = false
 
-	_cloudhsmv2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_cloudhsmv2Cmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_cloudhsmv2Cmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_cloudhsmv2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_cloudhsmv2Cmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_cloudhsmv2Cmd.Flags().StringVarP(&_cloudhsmv2AvailabilityZone, "availability-zone", "", "", "Availability Zone")
 	_cloudhsmv2Cmd.Flags().StringVarP(&_cloudhsmv2BackupId, "backup-id", "", "", "Backup ID")

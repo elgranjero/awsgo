@@ -14,6 +14,7 @@ var _ebsCmd = &cobra.Command{
 	Use:   "ebs",
 	Short: "AWS ebs CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -407,10 +408,10 @@ func init() {
 	_rootCmd.AddCommand(_ebsCmd)
 	_ebsCmd.Flags().SortFlags = false
 
-	_ebsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_ebsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_ebsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_ebsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_ebsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_ebsCmd.Flags().StringVarP(&_ebsBlockData, "block-data", "", "", "Block Data")
 	_ebsCmd.Flags().StringVarP(&_ebsBlockIndex, "block-index", "", "", "Block Index")

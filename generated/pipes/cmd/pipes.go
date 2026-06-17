@@ -14,6 +14,7 @@ var _pipesCmd = &cobra.Command{
 	Use:   "pipes",
 	Short: "AWS pipes CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -475,10 +476,10 @@ func init() {
 	_rootCmd.AddCommand(_pipesCmd)
 	_pipesCmd.Flags().SortFlags = false
 
-	_pipesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_pipesCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_pipesCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_pipesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_pipesCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_pipesCmd.Flags().StringVarP(&_pipesCurrentState, "current-state", "", "", "Current State")
 	_pipesCmd.Flags().StringVarP(&_pipesDescription, "description", "", "", "Description")

@@ -14,6 +14,7 @@ var _lookoutequipmentCmd = &cobra.Command{
 	Use:   "lookoutequipment",
 	Short: "AWS lookoutequipment CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -2024,10 +2025,10 @@ func init() {
 	_rootCmd.AddCommand(_lookoutequipmentCmd)
 	_lookoutequipmentCmd.Flags().SortFlags = false
 
-	_lookoutequipmentCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_lookoutequipmentCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_lookoutequipmentCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_lookoutequipmentCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_lookoutequipmentCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_lookoutequipmentCmd.Flags().StringVarP(&_lookoutequipmentClientToken, "client-token", "", "", "Client Token")
 	_lookoutequipmentCmd.Flags().StringVarP(&_lookoutequipmentCreatedAtEndTime, "created-at-end-time", "", "", "Created At End Time")

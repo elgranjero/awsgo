@@ -14,6 +14,7 @@ var _iotmanagedintegrationsCmd = &cobra.Command{
 	Use:   "iotmanagedintegrations",
 	Short: "AWS iotmanagedintegrations CLI",
 	Run: func(cmd *cobra.Command, args []string) {
+		_awsOutput = resolveAWSOutput(_awsProfile, cmd.Flags().Changed("output"))
 		cfg, err := LoadAWSConfigWithMiddleware(_awsProfile)
 		if err != nil {
 			log.Errorf("Failed to load configuration: %s", err.Error())
@@ -3074,10 +3075,10 @@ func init() {
 	_rootCmd.AddCommand(_iotmanagedintegrationsCmd)
 	_iotmanagedintegrationsCmd.Flags().SortFlags = false
 
-	_iotmanagedintegrationsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "default", "Use Profile from ~/.aws/creds")
+	_iotmanagedintegrationsCmd.Flags().StringVarP(&_awsProfile, "profile", "", "", "AWS shared config profile")
 	_iotmanagedintegrationsCmd.Flags().StringVarP(&_awsRegion, "region", "", "", "Set AWS Region")
 
-	_iotmanagedintegrationsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "json", "Output format: json|yaml|text|table|csv|markdown|html")
+	_iotmanagedintegrationsCmd.Flags().StringVarP(&_awsOutput, "output", "o", "", "Output format: json|yaml|text|table|csv|markdown|html")
 
 	_iotmanagedintegrationsCmd.Flags().StringVarP(&_iotmanagedintegrationsAccountAssociationId, "account-association-id", "", "", "Account Association ID")
 	_iotmanagedintegrationsCmd.Flags().StringVarP(&_iotmanagedintegrationsAuthConfig, "auth-config", "", "", "Auth Config")
