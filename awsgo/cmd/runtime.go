@@ -724,7 +724,7 @@ func coerceScalar(typ, raw string) (any, error) {
 			return nil, err
 		}
 		return v, nil
-	case strings.HasPrefix(t, "types."), strings.HasPrefix(t, "map["):
+	case strings.HasPrefix(t, "map["):
 		if strings.HasPrefix(strings.TrimSpace(raw), "{") {
 			var obj map[string]any
 			if err := stdjson.Unmarshal([]byte(raw), &obj); err == nil {
@@ -732,6 +732,19 @@ func coerceScalar(typ, raw string) (any, error) {
 			}
 		}
 		return parseShorthandMap(raw), nil
+	case strings.HasPrefix(t, "types."):
+		trimmed := strings.TrimSpace(raw)
+		if strings.HasPrefix(trimmed, "{") {
+			var obj map[string]any
+			if err := stdjson.Unmarshal([]byte(trimmed), &obj); err == nil {
+				return obj, nil
+			}
+			return parseShorthandMap(raw), nil
+		}
+		if findTopLevel(trimmed, '=') >= 0 {
+			return parseShorthandMap(raw), nil
+		}
+		return raw, nil
 	default:
 		return raw, nil
 	}
@@ -838,8 +851,12 @@ func helpType(typ string) string {
 		return "bool"
 	case strings.Contains(t, "time.Time"):
 		return "timestamp"
-	case strings.HasPrefix(t, "types."), strings.HasPrefix(t, "map["):
+	case strings.HasPrefix(t, "map["):
 		return "object"
+	case strings.HasPrefix(strings.TrimSpace(typ), "*types."):
+		return "object"
+	case strings.HasPrefix(t, "types."):
+		return "string"
 	default:
 		return "string"
 	}

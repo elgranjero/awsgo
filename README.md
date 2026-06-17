@@ -361,3 +361,8 @@ make tidy
 This repository currently uses an all-rights-reserved license. Before publishing
 for public use or accepting outside contributions, replace `LICENSE` with the
 intended open-source license.
+
+## AI Assistance
+
+This project was built with assistance from OpenAI Codex using a GPT-5 Codex
+model.

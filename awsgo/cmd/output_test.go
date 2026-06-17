@@ -43,3 +43,18 @@ func TestFormatOutputHTML(t *testing.T) {
 		t.Fatalf("expected html table output, got %q", got)
 	}
 }
+
+func TestWriteOutputNormalizesNilSlices(t *testing.T) {
+	type response struct {
+		Datapoints []string
+		Label      string
+	}
+	out, err := writeOutput(nil, nil, response{Label: "VolumeWriteIOPs"}, "json")
+	if err != nil {
+		t.Fatalf("writeOutput returned error: %v", err)
+	}
+	got := string(out)
+	if !strings.Contains(got, `"Datapoints": []`) {
+		t.Fatalf("expected nil slice to render as empty array, got %q", got)
+	}
+}

@@ -6,6 +6,7 @@ import (
 	stdjson "encoding/json"
 	"fmt"
 	"html"
+	"reflect"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -15,6 +16,7 @@ import (
 
 func writeOutput(headers []string, rows [][]string, structured any, format string) ([]byte, error) {
 	var b bytes.Buffer
+	structured = normalizeNilSlices(structured)
 	switch strings.ToLower(format) {
 	case "md", "markdown":
 		writeMarkdown(&b, headers, rows)
@@ -43,6 +45,118 @@ func writeOutput(headers []string, rows [][]string, structured any, format strin
 		b.WriteByte('\n')
 	}
 	return b.Bytes(), nil
+}
+
+func normalizeNilSlices(v any) any {
+	rv := reflect.ValueOf(v)
+	if !rv.IsValid() {
+		return v
+	}
+	normalized := normalizeNilSlicesValue(rv)
+	if !normalized.IsValid() {
+		return v
+	}
+	return normalized.Interface()
+}
+
+func normalizeNilSlicesValue(v reflect.Value) reflect.Value {
+	if !v.IsValid() {
+		return v
+	}
+	if isJSONMarshaler(v) {
+		return v
+	}
+	switch v.Kind() {
+	case reflect.Interface:
+		if v.IsNil() {
+			return v
+		}
+		return normalizeNilSlicesValue(v.Elem())
+	case reflect.Ptr:
+		if v.IsNil() {
+			return v
+		}
+		elem := normalizeNilSlicesValue(v.Elem())
+		out := reflect.New(v.Type().Elem())
+		setNormalizedValue(out.Elem(), elem)
+		return out
+	case reflect.Struct:
+		out := reflect.New(v.Type()).Elem()
+		for i := 0; i < v.NumField(); i++ {
+			dst := out.Field(i)
+			if !dst.CanSet() {
+				continue
+			}
+			src := v.Field(i)
+			if !src.CanInterface() {
+				continue
+			}
+			setNormalizedValue(dst, normalizeNilSlicesValue(src))
+		}
+		return out
+	case reflect.Slice:
+		if v.IsNil() {
+			return reflect.MakeSlice(v.Type(), 0, 0)
+		}
+		out := reflect.MakeSlice(v.Type(), v.Len(), v.Len())
+		for i := 0; i < v.Len(); i++ {
+			setNormalizedValue(out.Index(i), normalizeNilSlicesValue(v.Index(i)))
+		}
+		return out
+	case reflect.Array:
+		out := reflect.New(v.Type()).Elem()
+		for i := 0; i < v.Len(); i++ {
+			setNormalizedValue(out.Index(i), normalizeNilSlicesValue(v.Index(i)))
+		}
+		return out
+	case reflect.Map:
+		if v.IsNil() {
+			return v
+		}
+		out := reflect.MakeMapWithSize(v.Type(), v.Len())
+		iter := v.MapRange()
+		for iter.Next() {
+			val := normalizeNilSlicesValue(iter.Value())
+			if val.IsValid() && val.Type().AssignableTo(v.Type().Elem()) {
+				out.SetMapIndex(iter.Key(), val)
+			} else if val.IsValid() && val.Type().ConvertibleTo(v.Type().Elem()) {
+				out.SetMapIndex(iter.Key(), val.Convert(v.Type().Elem()))
+			} else {
+				out.SetMapIndex(iter.Key(), iter.Value())
+			}
+		}
+		return out
+	default:
+		return v
+	}
+}
+
+func isJSONMarshaler(v reflect.Value) bool {
+	marshalerType := reflect.TypeOf((*stdjson.Marshaler)(nil)).Elem()
+	if v.CanInterface() && v.Type().Implements(marshalerType) {
+		return true
+	}
+	if v.CanAddr() && v.Addr().CanInterface() && v.Addr().Type().Implements(marshalerType) {
+		return true
+	}
+	return false
+}
+
+func setNormalizedValue(dst, src reflect.Value) {
+	if !src.IsValid() || !dst.CanSet() {
+		return
+	}
+	if src.Type().AssignableTo(dst.Type()) {
+		dst.Set(src)
+		return
+	}
+	if src.Type().ConvertibleTo(dst.Type()) {
+		dst.Set(src.Convert(dst.Type()))
+		return
+	}
+	if dst.Kind() == reflect.Interface && src.Type().Implements(dst.Type()) {
+		dst.Set(src)
+	}
 }
 
 func writeCSV(out *bytes.Buffer, headers []string, rows [][]string) {

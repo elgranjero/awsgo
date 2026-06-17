@@ -149,3 +149,26 @@ func TestCoerceValueListScalarCommaSeparated(t *testing.T) {
 		t.Fatalf("unexpected values: %#v", arr)
 	}
 }
+
+func TestCoerceValueListEnumString(t *testing.T) {
+	v, err := coerceValue("[]types.Statistic", "Average")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	arr, ok := v.([]any)
+	if !ok {
+		t.Fatalf("expected []any, got %#v", v)
+	}
+	if len(arr) != 1 || arr[0] != "Average" {
+		t.Fatalf("enum values should stay strings, got %#v", arr)
+	}
+}
+
+func TestHelpTypeEnumString(t *testing.T) {
+	if got := helpType("types.StandardUnit"); got != "string" {
+		t.Fatalf("enum help type mismatch: %q", got)
+	}
+	if got := helpType("*types.DefaultAction"); got != "object" {
+		t.Fatalf("object help type mismatch: %q", got)
+	}
+}

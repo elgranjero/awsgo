@@ -789,7 +789,7 @@ func writeSplitEntrypoints(root, modulePath string, services []serviceMeta) erro
 		if err := os.MkdirAll(serviceDir, 0o755); err != nil {
 			return err
 		}
-		src := renderServiceMain(modulePath, svc.Name)
+		src := renderServiceMain(modulePath, svc)
 		if err := os.WriteFile(filepath.Join(serviceDir, "main.go"), src, 0o644); err != nil {
 			return err
 		}
@@ -797,16 +797,87 @@ func writeSplitEntrypoints(root, modulePath string, services []serviceMeta) erro
 	return nil
 }
 
-func renderServiceMain(modulePath, service string) []byte {
+func renderServiceMain(modulePath string, svc serviceMeta) []byte {
 	var b bytes.Buffer
 	b.WriteString("package main\n\n")
 	b.WriteString("import (\n")
 	b.WriteString("\t\"fmt\"\n")
 	b.WriteString("\t\"os\"\n\n")
-	fmt.Fprintf(&b, "\tservicecmd %q\n", modulePath+"/generated/"+service+"/cmd")
+	fmt.Fprintf(&b, "\truntime %q\n", modulePath+"/awsgo/svcruntime")
+	fmt.Fprintf(&b, "\tservicecmd %q\n", modulePath+"/generated/"+svc.Name+"/cmd")
 	b.WriteString(")\n\n")
 	b.WriteString("func main() {\n")
-	b.WriteString("\tif err := servicecmd.Execute(os.Args[1:]); err != nil {\n")
+	b.WriteString("\tsvc := runtime.ServiceDef{\n")
+	b.WriteString("\t\tOperations: []string{")
+	for i, op := range svc.Operations {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		fmt.Fprintf(&b, "%q", op)
+	}
+	b.WriteString("},\n")
+	b.WriteString("\t\tOperationSet: map[string]bool{")
+	for i, op := range svc.Operations {
+		if i > 0 {
+			b.WriteString(" ")
+		}
+		fmt.Fprintf(&b, "%q: true,", op)
+	}
+	b.WriteString("},\n")
+	b.WriteString("\t\tOperationInputs: map[string][]string{\n")
+	opNames := make([]string, 0, len(svc.OperationInputs))
+	for op := range svc.OperationInputs {
+		opNames = append(opNames, op)
+	}
+	sort.Strings(opNames)
+	for _, op := range opNames {
+		fields := append([]string(nil), svc.OperationInputs[op]...)
+		sort.Strings(fields)
+		fmt.Fprintf(&b, "\t\t\t%q: {", op)
+		for i, f := range fields {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			fmt.Fprintf(&b, "%q", f)
+		}
+		b.WriteString("},\n")
+	}
+	b.WriteString("\t\t},\n")
+	b.WriteString("\t\tOperationInputTypes: map[string]map[string]string{\n")
+	for _, op := range opNames {
+		typeMap := svc.OperationInputTypes[op]
+		typeFields := make([]string, 0, len(typeMap))
+		for f := range typeMap {
+			typeFields = append(typeFields, f)
+		}
+		sort.Strings(typeFields)
+		fmt.Fprintf(&b, "\t\t\t%q: {", op)
+		for i, f := range typeFields {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			fmt.Fprintf(&b, "%q: %q", f, typeMap[f])
+		}
+		b.WriteString("},\n")
+	}
+	b.WriteString("\t\t},\n")
+	b.WriteString("\t\tOperationInputRequired: map[string][]string{\n")
+	for _, op := range opNames {
+		requiredFields := append([]string(nil), svc.OperationInputRequired[op]...)
+		sort.Strings(requiredFields)
+		fmt.Fprintf(&b, "\t\t\t%q: {", op)
+		for i, f := range requiredFields {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			fmt.Fprintf(&b, "%q", f)
+		}
+		b.WriteString("},\n")
+	}
+	b.WriteString("\t\t},\n")
+	b.WriteString("\t\tRun: servicecmd.Execute,\n")
+	b.WriteString("\t}\n")
+	fmt.Fprintf(&b, "\tif err := runtime.ExecuteService(%q, svc, os.Args[1:]); err != nil {\n", svc.Name)
 	b.WriteString("\t\tfmt.Fprintln(os.Stderr, err)\n")
 	b.WriteString("\t\tos.Exit(1)\n")
 	b.WriteString("\t}\n")
