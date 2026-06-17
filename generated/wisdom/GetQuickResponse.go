@@ -1,0 +1,6 @@
+package wisdom
+
+// GetQuickResponse is generated as a reference stub.
+// Executable command wiring lives under cmd/wisdom.go.
+//
+// Retrieves the quick response.

@@ -1,0 +1,34 @@
+package simspaceweaver
+
+// CreateSnapshot is generated as a reference stub.
+// Executable command wiring lives under cmd/simspaceweaver.go.
+//
+// Creates a snapshot of the specified simulation. A snapshot is a file that
+// contains simulation state data at a specific time. The state data saved in a
+// snapshot includes entity data from the State Fabric, the simulation
+// configuration specified in the schema, and the clock tick number. You can use
+// the snapshot to initialize a new simulation. For more information about
+// snapshots, see [Snapshots]in the SimSpace Weaver User Guide.
+//
+// You specify a Destination when you create a snapshot. The Destination is the
+// name of an Amazon S3 bucket and an optional ObjectKeyPrefix . The
+// ObjectKeyPrefix is usually the name of a folder in the bucket. SimSpace Weaver
+// creates a snapshot folder inside the Destination and places the snapshot file
+// there.
+//
+// The snapshot file is an Amazon S3 object. It has an object key with the form:
+// object-key-prefix/snapshot/simulation-name-YYMMdd-HHmm-ss.zip , where:
+//
+// - YY is the 2-digit year
+//
+// - MM is the 2-digit month
+//
+// - dd is the 2-digit day of the month
+//
+// - HH is the 2-digit hour (24-hour clock)
+//
+// - mm is the 2-digit minutes
+//
+// - ss is the 2-digit seconds
+//
+// [Snapshots]: https://docs.aws.amazon.com/simspaceweaver/latest/userguide/working-with_snapshots.html

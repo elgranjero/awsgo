@@ -1,0 +1,6 @@
+package workspacesweb
+
+// GetUserSettings is generated as a reference stub.
+// Executable command wiring lives under cmd/workspacesweb.go.
+//
+// Gets user settings.

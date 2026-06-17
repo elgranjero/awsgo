@@ -1,0 +1,7 @@
+package ssm
+
+// StartAssociationsOnce is generated as a reference stub.
+// Executable command wiring lives under cmd/ssm.go.
+//
+// Runs an association immediately and only one time. This operation can be
+// helpful when troubleshooting associations.

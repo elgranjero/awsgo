@@ -1,0 +1,6 @@
+package mailmanager
+
+// UpdateIngressPoint is generated as a reference stub.
+// Executable command wiring lives under cmd/mailmanager.go.
+//
+// Update attributes of a provisioned ingress endpoint resource.

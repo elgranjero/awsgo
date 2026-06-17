@@ -1,0 +1,16 @@
+package rds
+
+// ModifyDBCluster is generated as a reference stub.
+// Executable command wiring lives under cmd/rds.go.
+//
+// Modifies the settings of an Amazon Aurora DB cluster or a Multi-AZ DB cluster.
+// You can change one or more settings by specifying these parameters and the new
+// values in the request.
+//
+// For more information on Amazon Aurora DB clusters, see [What is Amazon Aurora?] in the Amazon Aurora
+// User Guide.
+//
+// For more information on Multi-AZ DB clusters, see [Multi-AZ DB cluster deployments] in the Amazon RDS User Guide.
+//
+// [What is Amazon Aurora?]: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html
+// [Multi-AZ DB cluster deployments]: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/multi-az-db-clusters-concepts.html

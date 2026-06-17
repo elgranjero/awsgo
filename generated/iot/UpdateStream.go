@@ -1,0 +1,10 @@
+package iot
+
+// UpdateStream is generated as a reference stub.
+// Executable command wiring lives under cmd/iot.go.
+//
+// Updates an existing stream. The stream version will be incremented by one.
+//
+// Requires permission to access the [UpdateStream] action.
+//
+// [UpdateStream]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions

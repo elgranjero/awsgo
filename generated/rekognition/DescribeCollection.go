@@ -1,0 +1,11 @@
+package rekognition
+
+// DescribeCollection is generated as a reference stub.
+// Executable command wiring lives under cmd/rekognition.go.
+//
+// Describes the specified collection. You can use DescribeCollection to get
+// information, such as the number of faces indexed into a collection and the
+// version of the model used by the collection for face detection.
+//
+// For more information, see Describing a Collection in the Amazon Rekognition
+// Developer Guide.

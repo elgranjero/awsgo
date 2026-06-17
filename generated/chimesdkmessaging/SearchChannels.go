@@ -1,0 +1,15 @@
+package chimesdkmessaging
+
+// SearchChannels is generated as a reference stub.
+// Executable command wiring lives under cmd/chimesdkmessaging.go.
+//
+// Allows the ChimeBearer to search channels by channel members. Users or bots can
+// search across the channels that they belong to. Users in the AppInstanceAdmin
+// role can search across all channels.
+//
+// The x-amz-chime-bearer request header is mandatory. Use the ARN of the
+// AppInstanceUser or AppInstanceBot that makes the API call as the value in the
+// header.
+//
+// This operation isn't supported for AppInstanceUsers with a large number of
+// memberships.

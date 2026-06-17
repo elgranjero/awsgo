@@ -1,0 +1,10 @@
+package iot
+
+// ListCertificatesByCA is generated as a reference stub.
+// Executable command wiring lives under cmd/iot.go.
+//
+// List the device certificates signed by the specified CA certificate.
+//
+// Requires permission to access the [ListCertificatesByCA] action.
+//
+// [ListCertificatesByCA]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions

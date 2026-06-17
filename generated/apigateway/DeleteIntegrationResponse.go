@@ -1,0 +1,6 @@
+package apigateway
+
+// DeleteIntegrationResponse is generated as a reference stub.
+// Executable command wiring lives under cmd/apigateway.go.
+//
+// Represents a delete integration response.

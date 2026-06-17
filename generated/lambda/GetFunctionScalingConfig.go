@@ -1,0 +1,6 @@
+package lambda
+
+// GetFunctionScalingConfig is generated as a reference stub.
+// Executable command wiring lives under cmd/lambda.go.
+//
+// Retrieves the scaling configuration for a Lambda Managed Instances function.

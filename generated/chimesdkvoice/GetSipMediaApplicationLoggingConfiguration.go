@@ -1,0 +1,6 @@
+package chimesdkvoice
+
+// GetSipMediaApplicationLoggingConfiguration is generated as a reference stub.
+// Executable command wiring lives under cmd/chimesdkvoice.go.
+//
+// Retrieves the logging configuration for the specified SIP media application.

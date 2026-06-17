@@ -1,0 +1,11 @@
+package route53
+
+// ListVPCAssociationAuthorizations is generated as a reference stub.
+// Executable command wiring lives under cmd/route53.go.
+//
+// Gets a list of the VPCs that were created by other accounts and that can be
+// associated with a specified hosted zone because you've submitted one or more
+// CreateVPCAssociationAuthorization requests.
+//
+// The response includes a VPCs element with a VPC child element for each VPC that
+// can be associated with the hosted zone.

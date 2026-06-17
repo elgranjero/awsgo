@@ -1,0 +1,20 @@
+package ec2
+
+// ModifySnapshotAttribute is generated as a reference stub.
+// Executable command wiring lives under cmd/ec2.go.
+//
+// Adds or removes permission settings for the specified snapshot. You may add or
+// remove specified Amazon Web Services account IDs from a snapshot's list of
+// create volume permissions, but you cannot do both in a single operation. If you
+// need to both add and remove account IDs for a snapshot, you must use multiple
+// operations. You can make up to 500 modifications to a snapshot in a single
+// operation.
+//
+// Encrypted snapshots and snapshots with Amazon Web Services Marketplace product
+// codes cannot be made public. Snapshots encrypted with your default KMS key
+// cannot be shared with other accounts.
+//
+// For more information about modifying snapshot permissions, see [Share a snapshot] in the Amazon
+// EBS User Guide.
+//
+// [Share a snapshot]: https://docs.aws.amazon.com/ebs/latest/userguide/ebs-modifying-snapshot-permissions.html

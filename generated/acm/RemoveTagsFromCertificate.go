@@ -1,0 +1,12 @@
+package acm
+
+// RemoveTagsFromCertificate is generated as a reference stub.
+// Executable command wiring lives under cmd/acm.go.
+//
+// Remove one or more tags from an ACM certificate. A tag consists of a key-value
+// pair. If you do not specify the value portion of the tag when calling this
+// function, the tag will be removed regardless of value. If you specify a value,
+// the tag is removed only if it is associated with the specified value.
+//
+// To add tags to a certificate, use the AddTagsToCertificate action. To view all of the tags that
+// have been applied to a specific ACM certificate, use the ListTagsForCertificateaction.

@@ -1,0 +1,12 @@
+package greengrassv2
+
+// DisassociateServiceRoleFromAccount is generated as a reference stub.
+// Executable command wiring lives under cmd/greengrassv2.go.
+//
+// Disassociates the Greengrass service role from IoT Greengrass for your Amazon
+// Web Services account in this Amazon Web Services Region. Without a service role,
+// IoT Greengrass can't verify the identity of client devices or manage core device
+// connectivity information. For more information, see [Greengrass service role]in the IoT Greengrass
+// Version 2 Developer Guide.
+//
+// [Greengrass service role]: https://docs.aws.amazon.com/greengrass/v2/developerguide/greengrass-service-role.html

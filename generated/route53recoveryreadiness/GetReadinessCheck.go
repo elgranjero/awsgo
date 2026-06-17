@@ -1,0 +1,6 @@
+package route53recoveryreadiness
+
+// GetReadinessCheck is generated as a reference stub.
+// Executable command wiring lives under cmd/route53recoveryreadiness.go.
+//
+// Gets details about a readiness check.

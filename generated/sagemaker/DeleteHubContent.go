@@ -1,0 +1,6 @@
+package sagemaker
+
+// DeleteHubContent is generated as a reference stub.
+// Executable command wiring lives under cmd/sagemaker.go.
+//
+// Delete the contents of a hub.

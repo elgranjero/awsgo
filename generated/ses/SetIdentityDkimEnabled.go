@@ -1,0 +1,24 @@
+package ses
+
+// SetIdentityDkimEnabled is generated as a reference stub.
+// Executable command wiring lives under cmd/ses.go.
+//
+// Enables or disables Easy DKIM signing of email sent from an identity. If Easy
+// DKIM signing is enabled for a domain, then Amazon SES uses DKIM to sign all
+// email that it sends from addresses on that domain. If Easy DKIM signing is
+// enabled for an email address, then Amazon SES uses DKIM to sign all email it
+// sends from that address.
+//
+// For email addresses (for example, user(at)example.com ), you can only enable DKIM
+// signing if the corresponding domain (in this case, example.com ) has been set up
+// to use Easy DKIM.
+//
+// You can enable DKIM signing for an identity at any time after you start the
+// verification process for the identity, even if the verification process isn't
+// complete.
+//
+// You can execute this operation no more than once per second.
+//
+// For more information about Easy DKIM signing, go to the [Amazon SES Developer Guide].
+//
+// [Amazon SES Developer Guide]: https://docs.aws.amazon.com/ses/latest/dg/send-email-authentication-dkim-easy.html

@@ -1,0 +1,15 @@
+package sfn
+
+// ListStateMachines is generated as a reference stub.
+// Executable command wiring lives under cmd/sfn.go.
+//
+// Lists the existing state machines.
+//
+// If nextToken is returned, there are more results available. The value of
+// nextToken is a unique pagination token for each page. Make the call again using
+// the returned token to retrieve the next page. Keep all other arguments
+// unchanged. Each pagination token expires after 24 hours. Using an expired
+// pagination token will return an HTTP 400 InvalidToken error.
+//
+// This operation is eventually consistent. The results are best effort and may
+// not reflect very recent updates and changes.

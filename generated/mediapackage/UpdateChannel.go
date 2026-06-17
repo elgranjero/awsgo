@@ -1,0 +1,6 @@
+package mediapackage
+
+// UpdateChannel is generated as a reference stub.
+// Executable command wiring lives under cmd/mediapackage.go.
+//
+// Updates an existing Channel.

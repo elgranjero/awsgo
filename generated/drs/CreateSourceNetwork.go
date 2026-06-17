@@ -1,0 +1,6 @@
+package drs
+
+// CreateSourceNetwork is generated as a reference stub.
+// Executable command wiring lives under cmd/drs.go.
+//
+// Create a new Source Network resource for a provided VPC ID.

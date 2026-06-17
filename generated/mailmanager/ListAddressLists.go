@@ -1,0 +1,6 @@
+package mailmanager
+
+// ListAddressLists is generated as a reference stub.
+// Executable command wiring lives under cmd/mailmanager.go.
+//
+// Lists address lists for this account.

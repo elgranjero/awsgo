@@ -1,0 +1,15 @@
+package mediapackagev2
+
+// TagResource is generated as a reference stub.
+// Executable command wiring lives under cmd/mediapackagev2.go.
+//
+// Assigns one of more tags (key-value pairs) to the specified MediaPackage
+// resource.
+//
+// Tags can help you organize and categorize your resources. You can also use them
+// to scope user permissions, by granting a user permission to access or change
+// only resources with certain tag values. You can use the TagResource operation
+// with a resource that already has tags. If you specify a new tag key for the
+// resource, this tag is appended to the list of tags associated with the resource.
+// If you specify a tag key that is already associated with the resource, the new
+// tag value that you specify replaces the previous value for that tag.

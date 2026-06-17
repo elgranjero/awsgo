@@ -1,0 +1,6 @@
+package mq
+
+// DeleteBroker is generated as a reference stub.
+// Executable command wiring lives under cmd/mq.go.
+//
+// Deletes a broker. Note: This API is asynchronous.

@@ -1,0 +1,7 @@
+package observabilityadmin
+
+// ListS3TableIntegrations is generated as a reference stub.
+// Executable command wiring lives under cmd/observabilityadmin.go.
+//
+// Lists all S3 Table integrations in your account. We recommend using pagination
+// to ensure that the operation returns quickly and successfully.

@@ -1,0 +1,21 @@
+package machinelearning
+
+// CreateEvaluation is generated as a reference stub.
+// Executable command wiring lives under cmd/machinelearning.go.
+//
+// Creates a new Evaluation of an MLModel . An MLModel is evaluated on a set of
+// observations associated to a DataSource . Like a DataSource for an MLModel , the
+// DataSource for an Evaluation contains values for the Target Variable . The
+// Evaluation compares the predicted result for each observation to the actual
+// outcome and provides a summary so that you know how effective the MLModel
+// functions on the test data. Evaluation generates a relevant performance metric,
+// such as BinaryAUC, RegressionRMSE or MulticlassAvgFScore based on the
+// corresponding MLModelType : BINARY , REGRESSION or MULTICLASS .
+//
+// CreateEvaluation is an asynchronous operation. In response to CreateEvaluation ,
+// Amazon Machine Learning (Amazon ML) immediately returns and sets the evaluation
+// status to PENDING . After the Evaluation is created and ready for use, Amazon
+// ML sets the status to COMPLETED .
+//
+// You can use the GetEvaluation operation to check progress of the evaluation
+// during the creation operation.

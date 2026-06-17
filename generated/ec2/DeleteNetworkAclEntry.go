@@ -1,0 +1,7 @@
+package ec2
+
+// DeleteNetworkAclEntry is generated as a reference stub.
+// Executable command wiring lives under cmd/ec2.go.
+//
+// Deletes the specified ingress or egress entry (rule) from the specified network
+// ACL.

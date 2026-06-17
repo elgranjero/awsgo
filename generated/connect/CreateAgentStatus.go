@@ -1,0 +1,6 @@
+package connect
+
+// CreateAgentStatus is generated as a reference stub.
+// Executable command wiring lives under cmd/connect.go.
+//
+// Creates an agent status for the specified Amazon Connect instance.

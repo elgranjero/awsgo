@@ -1,0 +1,6 @@
+package pinpointsmsvoicev2
+
+// DescribeVerifiedDestinationNumbers is generated as a reference stub.
+// Executable command wiring lives under cmd/pinpointsmsvoicev2.go.
+//
+// Retrieves the specified verified destination numbers.

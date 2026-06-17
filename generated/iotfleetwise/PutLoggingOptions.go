@@ -1,0 +1,6 @@
+package iotfleetwise
+
+// PutLoggingOptions is generated as a reference stub.
+// Executable command wiring lives under cmd/iotfleetwise.go.
+//
+// Creates or updates the logging option.

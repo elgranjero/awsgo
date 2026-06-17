@@ -1,0 +1,6 @@
+package mediaconnect
+
+// ListRouterOutputs is generated as a reference stub.
+// Executable command wiring lives under cmd/mediaconnect.go.
+//
+// Retrieves a list of router outputs in AWS Elemental MediaConnect.

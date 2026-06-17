@@ -1,0 +1,6 @@
+package notifications
+
+// ListMemberAccounts is generated as a reference stub.
+// Executable command wiring lives under cmd/notifications.go.
+//
+// Returns a list of member accounts associated with a notification configuration.

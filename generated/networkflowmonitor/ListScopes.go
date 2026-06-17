@@ -1,0 +1,6 @@
+package networkflowmonitor
+
+// ListScopes is generated as a reference stub.
+// Executable command wiring lives under cmd/networkflowmonitor.go.
+//
+// List all the scopes for an account.

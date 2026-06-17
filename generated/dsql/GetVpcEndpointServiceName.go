@@ -1,0 +1,6 @@
+package dsql
+
+// GetVpcEndpointServiceName is generated as a reference stub.
+// Executable command wiring lives under cmd/dsql.go.
+//
+// Retrieves the VPC endpoint service name.

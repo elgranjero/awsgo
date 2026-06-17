@@ -1,0 +1,76 @@
+package s3
+
+// AbortMultipartUpload is generated as a reference stub.
+// Executable command wiring lives under cmd/s3.go.
+//
+// This operation aborts a multipart upload. After a multipart upload is aborted,
+// no additional parts can be uploaded using that upload ID. The storage consumed
+// by any previously uploaded parts will be freed. However, if any part uploads are
+// currently in progress, those part uploads might or might not succeed. As a
+// result, it might be necessary to abort a given multipart upload multiple times
+// in order to completely free all storage consumed by all parts.
+//
+// To verify that all parts have been removed and prevent getting charged for the
+// part storage, you should call the [ListParts]API operation and ensure that the parts list
+// is empty.
+//
+// - Directory buckets - If multipart uploads in a directory bucket are in
+// progress, you can't delete the bucket until all the in-progress multipart
+// uploads are aborted or completed. To delete these in-progress multipart uploads,
+// use the ListMultipartUploads operation to list the in-progress multipart
+// uploads in the bucket and use the AbortMultipartUpload operation to abort all
+// the in-progress multipart uploads.
+//
+// - Directory buckets - For directory buckets, you must make requests for this
+// API operation to the Zonal endpoint. These endpoints support
+// virtual-hosted-style requests in the format
+// https://amzn-s3-demo-bucket.s3express-zone-id.region-code.amazonaws.com/key-name
+// . Path-style requests are not supported. For more information about endpoints
+// in Availability Zones, see [Regional and Zonal endpoints for directory buckets in Availability Zones]in the Amazon S3 User Guide. For more information
+// about endpoints in Local Zones, see [Concepts for directory buckets in Local Zones]in the Amazon S3 User Guide.
+//
+// Permissions
+//
+// - General purpose bucket permissions - For information about permissions
+// required to use the multipart upload, see [Multipart Upload and Permissions]in the Amazon S3 User Guide.
+//
+// - Directory bucket permissions - To grant access to this API operation on a
+// directory bucket, we recommend that you use the [CreateSession]CreateSession API operation
+// for session-based authorization. Specifically, you grant the
+// s3express:CreateSession permission to the directory bucket in a bucket policy
+// or an IAM identity-based policy. Then, you make the CreateSession API call on
+// the bucket to obtain a session token. With the session token in your request
+// header, you can make API requests to this operation. After the session token
+// expires, you make another CreateSession API call to generate a new session
+// token for use. Amazon Web Services CLI or SDKs create session and refresh the
+// session token automatically to avoid service interruptions when a session
+// expires. For more information about authorization, see [CreateSession]CreateSession .
+//
+// HTTP Host header syntax  Directory buckets - The HTTP Host header syntax is
+// Bucket-name.s3express-zone-id.region-code.amazonaws.com .
+//
+// The following operations are related to AbortMultipartUpload :
+//
+// [CreateMultipartUpload]
+//
+// [UploadPart]
+//
+// [CompleteMultipartUpload]
+//
+// [ListParts]
+//
+// [ListMultipartUploads]
+//
+// You must URL encode any signed header values that contain spaces. For example,
+// if your header value is my file.txt , containing two spaces after my , you must
+// URL encode this value to my%20%20file.txt .
+//
+// [ListParts]: https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListParts.html
+// [Concepts for directory buckets in Local Zones]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-lzs-for-directory-buckets.html
+// [UploadPart]: https://docs.aws.amazon.com/AmazonS3/latest/API/API_UploadPart.html
+// [ListMultipartUploads]: https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListMultipartUploads.html
+// [CreateSession]: https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateSession.html
+// [Multipart Upload and Permissions]: https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuAndPermissions.html
+// [CompleteMultipartUpload]: https://docs.aws.amazon.com/AmazonS3/latest/API/API_CompleteMultipartUpload.html
+// [Regional and Zonal endpoints for directory buckets in Availability Zones]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/endpoint-directory-buckets-AZ.html
+// [CreateMultipartUpload]: https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html

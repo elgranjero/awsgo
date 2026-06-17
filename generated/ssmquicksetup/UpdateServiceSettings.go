@@ -1,0 +1,6 @@
+package ssmquicksetup
+
+// UpdateServiceSettings is generated as a reference stub.
+// Executable command wiring lives under cmd/ssmquicksetup.go.
+//
+// Updates settings configured for Quick Setup.

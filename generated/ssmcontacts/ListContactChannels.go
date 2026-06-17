@@ -1,0 +1,6 @@
+package ssmcontacts
+
+// ListContactChannels is generated as a reference stub.
+// Executable command wiring lives under cmd/ssmcontacts.go.
+//
+// Lists all contact channels for the specified contact.

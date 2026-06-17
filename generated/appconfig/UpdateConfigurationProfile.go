@@ -1,0 +1,6 @@
+package appconfig
+
+// UpdateConfigurationProfile is generated as a reference stub.
+// Executable command wiring lives under cmd/appconfig.go.
+//
+// Updates a configuration profile.

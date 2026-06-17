@@ -1,0 +1,21 @@
+package redshift
+
+// DescribeClusters is generated as a reference stub.
+// Executable command wiring lives under cmd/redshift.go.
+//
+// Returns properties of provisioned clusters including general cluster
+// properties, cluster database properties, maintenance and backup properties, and
+// security and access properties. This operation supports pagination. For more
+// information about managing clusters, go to [Amazon Redshift Clusters]in the Amazon Redshift Cluster
+// Management Guide.
+//
+// If you specify both tag keys and tag values in the same request, Amazon
+// Redshift returns all clusters that match any combination of the specified keys
+// and values. For example, if you have owner and environment for tag keys, and
+// admin and test for tag values, all clusters that have any combination of those
+// values are returned.
+//
+// If both tag keys and values are omitted from the request, clusters are returned
+// regardless of whether they have tag keys or values associated with them.
+//
+// [Amazon Redshift Clusters]: https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html

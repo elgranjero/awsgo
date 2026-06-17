@@ -1,0 +1,6 @@
+package quicksight
+
+// ListIAMPolicyAssignments is generated as a reference stub.
+// Executable command wiring lives under cmd/quicksight.go.
+//
+// Lists the IAM policy assignments in the current Amazon Quick Sight account.

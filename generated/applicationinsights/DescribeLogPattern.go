@@ -1,0 +1,6 @@
+package applicationinsights
+
+// DescribeLogPattern is generated as a reference stub.
+// Executable command wiring lives under cmd/applicationinsights.go.
+//
+// Describe a specific log pattern from a LogPatternSet .

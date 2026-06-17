@@ -1,0 +1,9 @@
+package dax
+
+// DeleteCluster is generated as a reference stub.
+// Executable command wiring lives under cmd/dax.go.
+//
+// Deletes a previously provisioned DAX cluster. DeleteCluster deletes all
+// associated nodes, node endpoints and the DAX cluster itself. When you receive a
+// successful response from this action, DAX immediately begins deleting the
+// cluster; you cannot cancel or revert this action.

@@ -1,0 +1,10 @@
+package iot
+
+// GetOTAUpdate is generated as a reference stub.
+// Executable command wiring lives under cmd/iot.go.
+//
+// Gets an OTA update.
+//
+// Requires permission to access the [GetOTAUpdate] action.
+//
+// [GetOTAUpdate]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions

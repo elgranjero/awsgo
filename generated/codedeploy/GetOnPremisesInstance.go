@@ -1,0 +1,6 @@
+package codedeploy
+
+// GetOnPremisesInstance is generated as a reference stub.
+// Executable command wiring lives under cmd/codedeploy.go.
+//
+// Gets information about an on-premises instance.

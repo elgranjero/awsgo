@@ -1,0 +1,67 @@
+package wafregional
+
+// UpdateIPSet is generated as a reference stub.
+// Executable command wiring lives under cmd/wafregional.go.
+//
+// This is AWS WAF Classic documentation. For more information, see [AWS WAF Classic] in the
+// developer guide.
+//
+// For the latest version of AWS WAF, use the AWS WAFV2 API and see the [AWS WAF Developer Guide]. With the
+// latest version, AWS WAF has a single set of endpoints for regional and global
+// use.
+//
+// Inserts or deletes IPSetDescriptor objects in an IPSet . For each IPSetDescriptor object, you
+// specify the following values:
+//
+// - Whether to insert or delete the object from the array. If you want to
+// change an IPSetDescriptor object, you delete the existing object and add a new
+// one.
+//
+// - The IP address version, IPv4 or IPv6 .
+//
+// - The IP address in CIDR notation, for example, 192.0.2.0/24 (for the range of
+// IP addresses from 192.0.2.0 to 192.0.2.255 ) or 192.0.2.44/32 (for the
+// individual IP address 192.0.2.44 ).
+//
+// AWS WAF supports IPv4 address ranges: /8 and any range between /16 through /32.
+// AWS WAF supports IPv6 address ranges: /24, /32, /48, /56, /64, and /128. For
+// more information about CIDR notation, see the Wikipedia entry [Classless Inter-Domain Routing].
+//
+// IPv6 addresses can be represented using any of the following formats:
+//
+// - 1111:0000:0000:0000:0000:0000:0000:0111/128
+//
+// - 1111:0:0:0:0:0:0:0111/128
+//
+// - 1111::0111/128
+//
+// - 1111::111/128
+//
+// You use an IPSet to specify which web requests you want to allow or block based
+// on the IP addresses that the requests originated from. For example, if you're
+// receiving a lot of requests from one or a small number of IP addresses and you
+// want to block the requests, you can create an IPSet that specifies those IP
+// addresses, and then configure AWS WAF to block the requests.
+//
+// To create and configure an IPSet , perform the following steps:
+//
+// - Submit a CreateIPSetrequest.
+//
+// - Use GetChangeTokento get the change token that you provide in the ChangeToken parameter of
+// an UpdateIPSetrequest.
+//
+// - Submit an UpdateIPSet request to specify the IP addresses that you want AWS
+// WAF to watch for.
+//
+// When you update an IPSet , you specify the IP addresses that you want to add
+// and/or the IP addresses that you want to delete. If you want to change an IP
+// address, you delete the existing IP address and add the new one.
+//
+// You can insert a maximum of 1000 addresses in a single request.
+//
+// For more information about how to use the AWS WAF API to allow or block HTTP
+// requests, see the [AWS WAF Developer Guide].
+//
+// [AWS WAF Classic]: https://docs.aws.amazon.com/waf/latest/developerguide/classic-waf-chapter.html
+// [AWS WAF Developer Guide]: https://docs.aws.amazon.com/waf/latest/developerguide/
+// [Classless Inter-Domain Routing]: https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing

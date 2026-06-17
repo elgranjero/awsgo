@@ -1,0 +1,7 @@
+package pinpoint
+
+// GetEndpoint is generated as a reference stub.
+// Executable command wiring lives under cmd/pinpoint.go.
+//
+// Retrieves information about the settings and attributes of a specific endpoint
+// for an application.

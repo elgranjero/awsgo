@@ -1,0 +1,265 @@
+package cmd
+
+import (
+	"bytes"
+	"encoding/csv"
+	stdjson "encoding/json"
+	"fmt"
+	"html"
+	"sort"
+	"strings"
+	"text/tabwriter"
+
+	"gopkg.in/yaml.v3"
+)
+
+func writeOutput(headers []string, rows [][]string, structured any, format string) ([]byte, error) {
+	var b bytes.Buffer
+	switch strings.ToLower(format) {
+	case "md", "markdown":
+		writeMarkdown(&b, headers, rows)
+	case "csv":
+		writeCSV(&b, headers, rows)
+	case "table":
+		writeTable(&b, headers, rows)
+	case "html":
+		writeHTML(&b, headers, rows)
+	case "text", "yaml":
+		data, err := yaml.Marshal(structured)
+		if err != nil {
+			return nil, err
+		}
+		b.Write(data)
+	case "", "json":
+		data, err := stdjson.MarshalIndent(structured, "", "  ")
+		if err != nil {
+			return nil, err
+		}
+		b.Write(data)
+	default:
+		return nil, fmt.Errorf("unsupported --output %q (valid: json|yaml|text|table|csv|markdown|html)", format)
+	}
+	if b.Len() > 0 && b.Bytes()[b.Len()-1] != '\n' {
+		b.WriteByte('\n')
+	}
+	return b.Bytes(), nil
+}
+
+func writeCSV(out *bytes.Buffer, headers []string, rows [][]string) {
+	w := csv.NewWriter(out)
+	if len(headers) > 0 {
+		_ = w.Write(headers)
+	}
+	_ = w.WriteAll(rows)
+	w.Flush()
+}
+
+func writeTable(out *bytes.Buffer, headers []string, rows [][]string) {
+	tw := tabwriter.NewWriter(out, 0, 4, 2, ' ', 0)
+	if len(headers) > 0 {
+		_, _ = fmt.Fprintln(tw, strings.Join(headers, "\t"))
+	}
+	for _, row := range rows {
+		_, _ = fmt.Fprintln(tw, strings.Join(row, "\t"))
+	}
+	_ = tw.Flush()
+}
+
+func writeMarkdown(out *bytes.Buffer, headers []string, rows [][]string) {
+	if len(headers) == 0 {
+		return
+	}
+	escape := func(s string) string {
+		s = strings.ReplaceAll(s, "\\", "\\\\")
+		s = strings.ReplaceAll(s, "|", "\\|")
+		s = strings.ReplaceAll(s, "\n", " ")
+		s = strings.ReplaceAll(s, "\r", "")
+		return s
+	}
+	escapedHeaders := make([]string, len(headers))
+	for i, h := range headers {
+		escapedHeaders[i] = escape(h)
+	}
+	_, _ = fmt.Fprintf(out, "| %s |\n", strings.Join(escapedHeaders, " | "))
+	sep := make([]string, len(headers))
+	for i := range headers {
+		sep[i] = "---"
+	}
+	_, _ = fmt.Fprintf(out, "| %s |\n", strings.Join(sep, " | "))
+	for _, row := range rows {
+		escaped := make([]string, len(headers))
+		for i := range headers {
+			val := ""
+			if i < len(row) {
+				val = row[i]
+			}
+			escaped[i] = escape(val)
+		}
+		_, _ = fmt.Fprintf(out, "| %s |\n", strings.Join(escaped, " | "))
+	}
+}
+
+func writeHTML(out *bytes.Buffer, headers []string, rows [][]string) {
+	var b strings.Builder
+	b.WriteString("<!doctype html>\n<html lang=\"en\">\n<head>\n")
+	b.WriteString("<meta charset=\"utf-8\"/>\n")
+	b.WriteString("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>\n")
+	b.WriteString("<title>Output</title>\n")
+	b.WriteString("<style>\n")
+	b.WriteString("  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }\n")
+	b.WriteString("  table { border-collapse: collapse; width: 100%; }\n")
+	b.WriteString("  th, td { padding: 8px 12px; border: 1px solid #ddd; }\n")
+	b.WriteString("  thead th { background-color: #222; color: #fff; text-align: left; }\n")
+	b.WriteString("  tbody tr:nth-child(even) { background-color: #f6f6f6; }\n")
+	b.WriteString("</style>\n")
+	b.WriteString("</head>\n<body>\n<table>\n")
+	if len(headers) > 0 {
+		b.WriteString("<thead><tr>")
+		for _, h := range headers {
+			b.WriteString("<th>")
+			b.WriteString(html.EscapeString(h))
+			b.WriteString("</th>")
+		}
+		b.WriteString("</tr></thead>\n")
+	}
+	b.WriteString("<tbody>\n")
+	for _, row := range rows {
+		b.WriteString("<tr>")
+		for i := range headers {
+			val := ""
+			if i < len(row) {
+				val = row[i]
+			}
+			b.WriteString("<td>")
+			b.WriteString(html.EscapeString(val))
+			b.WriteString("</td>")
+		}
+		b.WriteString("</tr>\n")
+	}
+	b.WriteString("</tbody>\n</table>\n</body>\n</html>\n")
+	out.WriteString(b.String())
+}
+
+func buildOutputRows(v any) ([]string, [][]string) {
+	switch x := v.(type) {
+	case []any:
+		if headers, rows, ok := rowsFromListOfMaps(x); ok {
+			return headers, rows
+		}
+		return []string{"Value"}, scalarRows(x)
+	case map[string]any:
+		if allScalars(x) {
+			keys := sortedMapKeys(x)
+			rows := make([][]string, 0, len(keys))
+			for _, k := range keys {
+				rows = append(rows, []string{k, fmt.Sprint(x[k])})
+			}
+			return []string{"Key", "Value"}, rows
+		}
+		var rows [][]string
+		flattenRows("", x, &rows)
+		return []string{"Path", "Value"}, rows
+	default:
+		return []string{"Value"}, [][]string{{fmt.Sprint(x)}}
+	}
+}
+
+func rowsFromListOfMaps(arr []any) ([]string, [][]string, bool) {
+	if len(arr) == 0 {
+		return []string{"Value"}, nil, true
+	}
+	keySet := map[string]struct{}{}
+	objs := make([]map[string]any, 0, len(arr))
+	for _, item := range arr {
+		obj, ok := item.(map[string]any)
+		if !ok || !allScalars(obj) {
+			return nil, nil, false
+		}
+		objs = append(objs, obj)
+		for k := range obj {
+			keySet[k] = struct{}{}
+		}
+	}
+	headers := make([]string, 0, len(keySet))
+	for k := range keySet {
+		headers = append(headers, k)
+	}
+	sortStrings(headers)
+	rows := make([][]string, 0, len(objs))
+	for _, obj := range objs {
+		row := make([]string, 0, len(headers))
+		for _, h := range headers {
+			row = append(row, fmt.Sprint(obj[h]))
+		}
+		rows = append(rows, row)
+	}
+	return headers, rows, true
+}
+
+func scalarRows(arr []any) [][]string {
+	rows := make([][]string, 0, len(arr))
+	for _, item := range arr {
+		rows = append(rows, []string{scalarString(item)})
+	}
+	return rows
+}
+
+func scalarString(v any) string {
+	switch vv := v.(type) {
+	case nil:
+		return ""
+	case map[string]any, []any:
+		b, _ := stdjson.Marshal(vv)
+		return string(b)
+	default:
+		return fmt.Sprint(v)
+	}
+}
+
+func allScalars(m map[string]any) bool {
+	for _, v := range m {
+		switch v.(type) {
+		case nil, bool, string, float64, float32, int, int32, int64, uint, uint32, uint64:
+		default:
+			return false
+		}
+	}
+	return true
+}
+
+func flattenRows(path string, v any, rows *[][]string) {
+	switch x := v.(type) {
+	case map[string]any:
+		keys := sortedMapKeys(x)
+		for _, k := range keys {
+			next := k
+			if path != "" {
+				next = path + "." + k
+			}
+			flattenRows(next, x[k], rows)
+		}
+	case []any:
+		for i, item := range x {
+			next := fmt.Sprintf("%s[%d]", path, i)
+			if path == "" {
+				next = fmt.Sprintf("[%d]", i)
+			}
+			flattenRows(next, item, rows)
+		}
+	default:
+		*rows = append(*rows, []string{path, fmt.Sprint(x)})
+	}
+}
+
+func sortedMapKeys(m map[string]any) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sortStrings(keys)
+	return keys
+}
+
+func sortStrings(v []string) {
+	sort.Strings(v)
+}

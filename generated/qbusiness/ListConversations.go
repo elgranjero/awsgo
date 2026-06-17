@@ -1,0 +1,6 @@
+package qbusiness
+
+// ListConversations is generated as a reference stub.
+// Executable command wiring lives under cmd/qbusiness.go.
+//
+// Lists one or more Amazon Q Business conversations.

@@ -1,0 +1,19 @@
+package batch
+
+// SubmitJob is generated as a reference stub.
+// Executable command wiring lives under cmd/batch.go.
+//
+// Submits an Batch job from a job definition. Parameters that are specified
+// during SubmitJoboverride parameters defined in the job definition. vCPU and memory
+// requirements that are specified in the resourceRequirements objects in the job
+// definition are the exception. They can't be overridden this way using the memory
+// and vcpus parameters. Rather, you must specify updates to job definition
+// parameters in a resourceRequirements object that's included in the
+// containerOverrides parameter.
+//
+// Job queues with a scheduling policy are limited to 500 active share identifiers
+// at a time.
+//
+// Jobs that run on Fargate resources can't be guaranteed to run for more than 14
+// days. This is because, after 14 days, Fargate resources might become unavailable
+// and job might be terminated.

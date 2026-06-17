@@ -1,0 +1,6 @@
+package chimesdkidentity
+
+// UpdateAppInstanceBot is generated as a reference stub.
+// Executable command wiring lives under cmd/chimesdkidentity.go.
+//
+// Updates the name and metadata of an AppInstanceBot .

@@ -1,0 +1,5 @@
+.gocache/
+.gomodcache/
+bin/
+*.test
+.DS_Store

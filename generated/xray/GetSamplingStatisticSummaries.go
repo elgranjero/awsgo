@@ -1,0 +1,6 @@
+package xray
+
+// GetSamplingStatisticSummaries is generated as a reference stub.
+// Executable command wiring lives under cmd/xray.go.
+//
+// Retrieves information about recent sampling results for all sampling rules.

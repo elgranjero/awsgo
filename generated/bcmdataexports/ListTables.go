@@ -1,0 +1,6 @@
+package bcmdataexports
+
+// ListTables is generated as a reference stub.
+// Executable command wiring lives under cmd/bcmdataexports.go.
+//
+// Lists all available tables in data exports.

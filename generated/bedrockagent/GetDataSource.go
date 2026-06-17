@@ -1,0 +1,6 @@
+package bedrockagent
+
+// GetDataSource is generated as a reference stub.
+// Executable command wiring lives under cmd/bedrockagent.go.
+//
+// Gets information about a data source.

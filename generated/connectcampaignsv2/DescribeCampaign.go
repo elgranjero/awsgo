@@ -1,0 +1,6 @@
+package connectcampaignsv2
+
+// DescribeCampaign is generated as a reference stub.
+// Executable command wiring lives under cmd/connectcampaignsv2.go.
+//
+// Describes the specific campaign.

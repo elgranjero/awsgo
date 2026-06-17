@@ -1,0 +1,7 @@
+package taxsettings
+
+// BatchGetTaxExemptions is generated as a reference stub.
+// Executable command wiring lives under cmd/taxsettings.go.
+//
+// Get the active tax exemptions for a given list of accounts. The IAM action is
+// tax:GetExemptions .

@@ -1,0 +1,6 @@
+package sagemaker
+
+// UpdateCluster is generated as a reference stub.
+// Executable command wiring lives under cmd/sagemaker.go.
+//
+// Updates a SageMaker HyperPod cluster.

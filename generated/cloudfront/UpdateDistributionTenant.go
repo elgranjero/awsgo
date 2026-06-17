@@ -1,0 +1,6 @@
+package cloudfront
+
+// UpdateDistributionTenant is generated as a reference stub.
+// Executable command wiring lives under cmd/cloudfront.go.
+//
+// Updates a distribution tenant.

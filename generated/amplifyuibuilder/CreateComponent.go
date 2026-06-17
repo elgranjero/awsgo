@@ -1,0 +1,6 @@
+package amplifyuibuilder
+
+// CreateComponent is generated as a reference stub.
+// Executable command wiring lives under cmd/amplifyuibuilder.go.
+//
+// Creates a new component for an Amplify app.

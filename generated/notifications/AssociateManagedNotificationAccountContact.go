@@ -1,0 +1,7 @@
+package notifications
+
+// AssociateManagedNotificationAccountContact is generated as a reference stub.
+// Executable command wiring lives under cmd/notifications.go.
+//
+// Associates an Account Contact with a particular ManagedNotificationConfiguration
+// .

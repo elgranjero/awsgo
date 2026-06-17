@@ -1,0 +1,29 @@
+package wellarchitected
+
+// ImportLens is generated as a reference stub.
+// Executable command wiring lives under cmd/wellarchitected.go.
+//
+// Import a new custom lens or update an existing custom lens.
+//
+// To update an existing custom lens, specify its ARN as the LensAlias . If no ARN
+// is specified, a new custom lens is created.
+//
+// The new or updated lens will have a status of DRAFT . The lens cannot be applied
+// to workloads or shared with other Amazon Web Services accounts until it's
+// published with CreateLensVersion.
+//
+// Lenses are defined in JSON. For more information, see [JSON format specification] in the Well-Architected
+// Tool User Guide.
+//
+// A custom lens cannot exceed 500 KB in size.
+//
+// # Disclaimer
+//
+// Do not include or gather personal identifiable information (PII) of end users
+// or other identifiable individuals in or via your custom lenses. If your custom
+// lens or those shared with you and used in your account do include or collect PII
+// you are responsible for: ensuring that the included PII is processed in
+// accordance with applicable law, providing adequate privacy notices, and
+// obtaining necessary consents for processing such data.
+//
+// [JSON format specification]: https://docs.aws.amazon.com/wellarchitected/latest/userguide/lenses-format-specification.html

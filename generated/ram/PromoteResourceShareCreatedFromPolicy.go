@@ -1,0 +1,21 @@
+package ram
+
+// PromoteResourceShareCreatedFromPolicy is generated as a reference stub.
+// Executable command wiring lives under cmd/ram.go.
+//
+// When you attach a resource-based policy to a resource, RAM automatically
+// creates a resource share of featureSet = CREATED_FROM_POLICY with a managed
+// permission that has the same IAM permissions as the original resource-based
+// policy. However, this type of managed permission is visible to only the resource
+// share owner, and the associated resource share can't be modified by using RAM.
+//
+// This operation promotes the resource share to a STANDARD resource share that is
+// fully manageable in RAM. When you promote a resource share, you can then manage
+// the resource share in RAM and it becomes visible to all of the principals you
+// shared it with.
+//
+// Before you perform this operation, you should first run PromotePermissionCreatedFromPolicyto ensure that you have
+// an appropriate customer managed permission that can be associated with this
+// resource share after its is promoted. If this operation can't find a managed
+// permission that exactly matches the existing CREATED_FROM_POLICY permission,
+// then this operation fails.

@@ -1,0 +1,6 @@
+package apigateway
+
+// GetBasePathMapping is generated as a reference stub.
+// Executable command wiring lives under cmd/apigateway.go.
+//
+// Describe a BasePathMapping resource.

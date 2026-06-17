@@ -1,0 +1,6 @@
+package securityir
+
+// GetMembership is generated as a reference stub.
+// Executable command wiring lives under cmd/securityir.go.
+//
+// Returns the attributes of a membership.

@@ -1,0 +1,7 @@
+package elasticbeanstalk
+
+// ListAvailableSolutionStacks is generated as a reference stub.
+// Executable command wiring lives under cmd/elasticbeanstalk.go.
+//
+// Returns a list of the available solution stack names, with the public version
+// first and then in reverse chronological order.

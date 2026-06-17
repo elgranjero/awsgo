@@ -1,0 +1,6 @@
+package redshift
+
+// DescribeCustomDomainAssociations is generated as a reference stub.
+// Executable command wiring lives under cmd/redshift.go.
+//
+// Contains information about custom domain associations for a cluster.

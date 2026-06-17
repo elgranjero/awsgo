@@ -1,0 +1,6 @@
+package medialive
+
+// DescribeNode is generated as a reference stub.
+// Executable command wiring lives under cmd/medialive.go.
+//
+// Get details about a Node in the specified Cluster.

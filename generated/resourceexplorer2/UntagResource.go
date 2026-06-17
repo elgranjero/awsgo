@@ -1,0 +1,7 @@
+package resourceexplorer2
+
+// UntagResource is generated as a reference stub.
+// Executable command wiring lives under cmd/resourceexplorer2.go.
+//
+// Removes one or more tag key and value pairs from an Amazon Web Services
+// Resource Explorer view or index.

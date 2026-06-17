@@ -1,0 +1,6 @@
+package groundstation
+
+// ReserveContact is generated as a reference stub.
+// Executable command wiring lives under cmd/groundstation.go.
+//
+// Reserves a contact using specified parameters.

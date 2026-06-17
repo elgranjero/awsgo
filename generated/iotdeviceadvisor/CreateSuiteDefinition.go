@@ -1,0 +1,10 @@
+package iotdeviceadvisor
+
+// CreateSuiteDefinition is generated as a reference stub.
+// Executable command wiring lives under cmd/iotdeviceadvisor.go.
+//
+// Creates a Device Advisor test suite.
+//
+// Requires permission to access the [CreateSuiteDefinition] action.
+//
+// [CreateSuiteDefinition]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions

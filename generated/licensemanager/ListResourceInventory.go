@@ -1,0 +1,6 @@
+package licensemanager
+
+// ListResourceInventory is generated as a reference stub.
+// Executable command wiring lives under cmd/licensemanager.go.
+//
+// Lists resources managed using Systems Manager inventory.

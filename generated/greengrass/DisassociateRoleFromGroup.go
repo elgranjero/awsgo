@@ -1,0 +1,6 @@
+package greengrass
+
+// DisassociateRoleFromGroup is generated as a reference stub.
+// Executable command wiring lives under cmd/greengrass.go.
+//
+// Disassociates the role from a group.
