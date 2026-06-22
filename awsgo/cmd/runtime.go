@@ -71,7 +71,8 @@ func runServiceOperation(service, operation string, passthrough []string) error 
 		debugf("service=%s operation=%s empty_stdout=true", service, operation)
 		return fmt.Errorf("operation produced no output")
 	}
-	queried, err := applyQuery(raw, queryExpr)
+	normalizedRaw := normalizeAWSCLIOutputRaw(raw)
+	queried, err := applyQuery(normalizedRaw, queryExpr)
 	if err != nil {
 		return err
 	}
@@ -1143,6 +1144,7 @@ func formatOutput(raw []byte, format string) ([]byte, error) {
 		// preserve source output when response isn't valid JSON
 		return raw, nil
 	}
+	structured = normalizeAWSCLIOutputDocument(structured)
 	headers, rows := buildOutputRows(structured)
 	out, err := writeOutput(headers, rows, structured, outFmt)
 	if err != nil {

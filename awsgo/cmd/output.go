@@ -6,10 +6,12 @@ import (
 	stdjson "encoding/json"
 	"fmt"
 	"html"
+	"net/url"
 	"reflect"
 	"sort"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -45,6 +47,193 @@ func writeOutput(headers []string, rows [][]string, structured any, format strin
 		b.WriteByte('\n')
 	}
 	return b.Bytes(), nil
+}
+
+func normalizeAWSCLIOutputRaw(raw []byte) []byte {
+	trimmed := bytes.TrimSpace(raw)
+	if len(trimmed) == 0 {
+		return raw
+	}
+	var v any
+	if err := stdjson.Unmarshal(trimmed, &v); err != nil {
+		return raw
+	}
+	v = normalizeAWSCLIOutputDocument(v)
+	b, err := stdjson.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return raw
+	}
+	return b
+}
+
+func normalizeAWSCLIOutput(v any) any {
+	switch x := v.(type) {
+	case []any:
+		out := make([]any, 0, len(x))
+		for _, item := range x {
+			out = append(out, normalizeAWSCLIOutput(item))
+		}
+		return out
+	case map[string]any:
+		return normalizeAWSCLIMap(x)
+	default:
+		return normalizeAWSCLIScalar(x)
+	}
+}
+
+func normalizeAWSCLIOutputDocument(v any) any {
+	if merged, ok := mergeRawPaginatorPages(v); ok {
+		return normalizeAWSCLIOutput(merged)
+	}
+	return normalizeAWSCLIOutput(v)
+}
+
+func normalizeAWSCLIMap(m map[string]any) map[string]any {
+	out := make(map[string]any, len(m))
+	truncated, _ := m["IsTruncated"].(bool)
+	for key, val := range m {
+		if key == "ResultMetadata" || key == "IsTruncated" {
+			continue
+		}
+		if val == nil {
+			continue
+		}
+		if shouldOmitEmptyNestedList(key, val, m) {
+			continue
+		}
+		if key == "Marker" {
+			if truncated {
+				out["NextToken"] = normalizeAWSCLIOutput(val)
+			}
+			continue
+		}
+		normalized := normalizeAWSCLIOutput(val)
+		if s, ok := normalized.(string); ok {
+			normalized = normalizeAWSCLIStringField(key, s)
+		}
+		out[key] = normalized
+	}
+	return out
+}
+
+func shouldOmitEmptyNestedList(key string, val any, parent map[string]any) bool {
+	if key != "Tags" || len(parent) <= 1 {
+		return false
+	}
+	list, ok := val.([]any)
+	return ok && len(list) == 0
+}
+
+func normalizeAWSCLIScalar(v any) any {
+	if s, ok := v.(string); ok {
+		return normalizeAWSTimestamp(s)
+	}
+	return v
+}
+
+func normalizeAWSCLIStringField(key, value string) any {
+	if decoded, ok := decodeAWSJSONDocument(value); ok && looksLikePolicyDocumentField(key) {
+		return decoded
+	}
+	return normalizeAWSTimestamp(value)
+}
+
+func looksLikePolicyDocumentField(key string) bool {
+	return key == "Document" || strings.HasSuffix(key, "PolicyDocument")
+}
+
+func decodeAWSJSONDocument(value string) (any, bool) {
+	s := strings.TrimSpace(value)
+	if s == "" {
+		return nil, false
+	}
+	if strings.Contains(s, "%") {
+		if decoded, err := url.QueryUnescape(s); err == nil {
+			s = strings.TrimSpace(decoded)
+		}
+	}
+	if !strings.HasPrefix(s, "{") && !strings.HasPrefix(s, "[") {
+		return nil, false
+	}
+	var out any
+	if err := stdjson.Unmarshal([]byte(s), &out); err != nil {
+		return nil, false
+	}
+	return normalizeAWSCLIOutput(out), true
+}
+
+func normalizeAWSTimestamp(value string) any {
+	if !looksLikeTimestamp(value) {
+		return value
+	}
+	t, err := time.Parse(time.RFC3339Nano, value)
+	if err != nil {
+		return value
+	}
+	return t.Format("2006-01-02T15:04:05-07:00")
+}
+
+func looksLikeTimestamp(value string) bool {
+	if len(value) < len("2006-01-02T15:04:05Z") {
+		return false
+	}
+	return value[4] == '-' && value[7] == '-' && value[10] == 'T' && value[13] == ':' && value[16] == ':'
+}
+
+func mergeRawPaginatorPages(v any) (any, bool) {
+	items, ok := v.([]any)
+	if !ok || len(items) == 0 {
+		return v, false
+	}
+	pages := make([]map[string]any, 0, len(items))
+	for _, item := range items {
+		page, ok := item.(map[string]any)
+		if !ok || !looksLikeRawPaginatorPage(page) {
+			return v, false
+		}
+		pages = append(pages, page)
+	}
+	if len(pages) == 1 {
+		return pages[0], true
+	}
+
+	merged := map[string]any{}
+	for _, page := range pages {
+		for key, val := range page {
+			if existing, ok := merged[key]; ok {
+				existingList, existingOK := existing.([]any)
+				newList, newOK := val.([]any)
+				if existingOK && newOK {
+					merged[key] = append(existingList, newList...)
+					continue
+				}
+			}
+			if key == "NextToken" {
+				merged[key] = val
+				continue
+			}
+			if _, ok := merged[key]; !ok {
+				merged[key] = val
+			}
+		}
+	}
+	return merged, true
+}
+
+func looksLikeRawPaginatorPage(page map[string]any) bool {
+	if _, ok := page["ResultMetadata"]; ok {
+		return true
+	}
+	if _, ok := page["IsTruncated"]; ok {
+		return true
+	}
+	if _, ok := page["Marker"]; ok {
+		return true
+	}
+	if _, ok := page["NextToken"]; ok {
+		return true
+	}
+	return false
 }
 
 func normalizeNilSlices(v any) any {

@@ -40,10 +40,7 @@ func runCLI(t *testing.T, bin string, args []string, extraEnv map[string]string)
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, bin, args...)
-	cmd.Env = os.Environ()
-	for k, v := range extraEnv {
-		cmd.Env = append(cmd.Env, k+"="+v)
-	}
+	cmd.Env = mergedEnv(extraEnv)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -62,6 +59,27 @@ func runCLI(t *testing.T, bin string, args []string, extraEnv map[string]string)
 		Stderr:   strings.TrimSpace(stderr.String()),
 		ExitCode: exitCode,
 	}
+}
+
+func mergedEnv(extra map[string]string) []string {
+	if len(extra) == 0 {
+		return os.Environ()
+	}
+	env := map[string]string{}
+	for _, item := range os.Environ() {
+		k, v, ok := strings.Cut(item, "=")
+		if ok {
+			env[k] = v
+		}
+	}
+	for k, v := range extra {
+		env[k] = v
+	}
+	out := make([]string, 0, len(env))
+	for k, v := range env {
+		out = append(out, k+"="+v)
+	}
+	return out
 }
 
 func requireBinary(t *testing.T, bin string) {
@@ -108,6 +126,15 @@ func mustContainAll(t *testing.T, haystack string, needles []string) {
 	for _, n := range needles {
 		if !strings.Contains(haystack, n) {
 			t.Fatalf("expected output to contain %q\n--- output ---\n%s", n, haystack)
+		}
+	}
+}
+
+func mustNotContainAny(t *testing.T, haystack string, needles []string) {
+	t.Helper()
+	for _, n := range needles {
+		if strings.Contains(haystack, n) {
+			t.Fatalf("expected output not to contain %q\n--- output ---\n%s", n, haystack)
 		}
 	}
 }

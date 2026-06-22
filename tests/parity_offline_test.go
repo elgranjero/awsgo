@@ -37,12 +37,19 @@ func TestParityHelpFlagNamesAcronymsAndRequiredOptional(t *testing.T) {
 	}
 	mustContainAll(t, out.Stdout, []string{
 		"--checksum-crc32",
-		"--checksum-crc32c",
-		"--checksum-crc64nvme",
+		"--checksum-crc32-c",
+		"--checksum-crc64-nvme",
 		"--checksum-sha1",
 		"--checksum-sha256",
 		"--content-md5",
 		"--sse-customer-key-md5",
+	})
+	mustNotContainAny(t, out.Stdout, []string{
+		"--checksum-c-r-c32",
+		"--checksum-c-r-c32-c",
+		"--checksum-crc32c",
+		"--checksum-crc64nvme",
+		"--content-m-d5",
 	})
 
 	out2 := runCLI(t, bin, []string{"wafv2", "create-web-acl", "--help"}, nil)
@@ -53,6 +60,9 @@ func TestParityHelpFlagNamesAcronymsAndRequiredOptional(t *testing.T) {
 		"--on-source-ddos-protection-config",
 		"Required",
 		"Optional",
+	})
+	mustNotContainAny(t, out2.Stdout, []string{
+		"--on-source-d-do-s-protection-config",
 	})
 }
 

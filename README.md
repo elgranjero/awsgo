@@ -42,6 +42,89 @@ bin/awsgo-services/awsgo-rds
 The dispatcher finds and executes the service binary only when that service is
 called.
 
+## Lean Runtime Pilot
+
+`bin/awsgo` prefers the experimental lean runtime for operations that have a
+lean implementation, then falls back to the full split service binary for every
+other operation.
+
+```text
+bin/awsgo
+bin/awsgo-lean-services/awsgo-lean-sts
+bin/awsgo-lean-services/awsgo-lean-ec2
+bin/awsgo-lean-services/awsgo-lean-s3
+```
+
+The lean path skips the generated Cobra command package for each service and
+calls selected AWS SDK operations directly through a smaller shared runtime. It
+is intentionally narrow today: `sts`, `ec2`, and `s3`, JSON output, and a small
+set of read-only operations. It exists to test whether a future generated direct
+SDK invoker can replace the heavier generated service command packages.
+
+Build the default dispatcher, full split service binaries, and lean pilot:
+
+```bash
+make build
+```
+
+Example:
+
+```bash
+bin/awsgo ec2 describe-instances --max-results 20 --profile default
+```
+
+Force the full split runtime instead of lean:
+
+```bash
+AWSGO_DISABLE_LEAN=1 bin/awsgo ec2 describe-instances --max-results 20
+```
+
+Current takeaway: the lean approach is a major binary-size win, but only a
+modest wall-clock runtime win over the current split architecture because most
+live AWS command time is spent waiting on AWS service/network latency.
+
+### Lean Runtime: Tested So Far
+
+The lean path has been tested as a pilot, not as a full replacement yet.
+
+Implemented lean operations:
+
+| Service | Operations |
+| --- | --- |
+| `sts` | `get-caller-identity` |
+| `ec2` | `describe-instances`, `describe-volumes` |
+| `s3` | `list-buckets` |
+
+Verified locally:
+
+- `bin/awsgo` routes JSON-compatible supported operations to lean by default.
+- `AWSGO_DISABLE_LEAN=1` forces the full split service runtime.
+- `--output text` falls back to the full split runtime because lean currently
+  supports JSON output only.
+- AWS shared config `output = text` also falls back to the full split runtime.
+- Unsupported lean operations, for example `iam list-roles`, use the full split
+  runtime.
+- `make build-dispatcher`, `make build-lean`, and `make test-safe` pass with
+  dispatcher, lean runtime, split runtime, and parity tests included.
+
+Live read-only benchmarks have been run for:
+
+- `sts get-caller-identity`
+- `ec2 describe-instances`
+- `s3 list-buckets`
+
+Not yet tested:
+
+- Generated lean implementations for every AWS service.
+- Mutating operations through the lean runtime.
+- Full AWS CLI output-format parity directly inside lean.
+- Full AWS CLI shorthand parity directly inside lean.
+
+The intended direction is to generate lean service binaries for every service
+and make direct SDK invocation the primary path. Until that generated lean path
+reaches full parity, the heavier split runtime remains the compatibility
+fallback.
+
 ## Requirements
 
 - Go 1.24 or newer.
@@ -58,7 +141,7 @@ You can override that path with `SDK_ROOT`.
 
 ## Build
 
-Build the dispatcher and all generated service binaries:
+Build the dispatcher, all generated service binaries, and the lean pilot:
 
 ```bash
 make build
@@ -269,6 +352,14 @@ Live parity tests are opt-in because they can call AWS APIs:
 make test-parity-live
 ```
 
+Lean-vs-full live parity is also opt-in. It compares the current lean-default
+path against the full generated service runtime for the lean read-only pilot
+operations:
+
+```bash
+make test-lean-full-live
+```
+
 ## One-Time Benchmarking
 
 The project includes a small, opt-in benchmark harness for comparing AWS CLI
@@ -296,11 +387,22 @@ make bench-readonly \
   BENCH_REPEAT=5
 ```
 
+Run the lean pilot benchmark subset:
+
+```bash
+make bench-lean-readonly \
+  BENCH_PROFILE=default \
+  BENCH_REGION=us-east-1 \
+  BENCH_REPEAT=5
+```
+
 The harness:
 
 - Uses read-only AWS APIs.
 - Disables pagination for both CLIs by default and caps result sizes where the
   underlying API exposes a limit field.
+- Is implemented as a Bash harness; it does not use Python or Perl helper
+  scripts.
 - Redirects command output and records only timing, status, and byte counts.
 - Writes local TSV files under `benchmarks/`, which are ignored by git.
 - Still uses real AWS API calls, so normal AWS API rate limits and any
@@ -310,23 +412,144 @@ Use this for a one-time data point before writing performance claims. The useful
 question is not “is Go always faster?” but “for common AWS read-only commands,
 how much startup/runtime overhead do we avoid compared with the Python AWS CLI?”
 
+### Planned Local Startup Benchmark
+
+The next benchmark should remove AWS service latency entirely and measure local
+startup/shutdown overhead only. The proposed local suite compares `aws` and
+`awsgo` by running help/parse-only commands that do not make network calls:
+
+- top-level help: `aws help` vs `bin/awsgo --help`
+- service help: `aws <service> help` vs `bin/awsgo <service> --help`
+- operation help: `aws <service> <operation> help` vs
+  `bin/awsgo <service> <operation> --help`
+
+This should be run with a bounded worker count, one command process per worker
+at a time, alternating CLI order between repeats, and with a small rest interval
+between commands so neither runtime gets an artificial warm-process advantage.
+The benchmark runner itself is implemented in Go under `awsgo/benchstartup`;
+Python is only present as part of the AWS CLI being measured.
+
+Run the lean local startup suite:
+
+```bash
+make bench-startup-local \
+  BENCH_STARTUP_SUITE=lean \
+  BENCH_STARTUP_REPEAT=25 \
+  BENCH_STARTUP_WORKERS=4 \
+  BENCH_STARTUP_REST_MS=100
+```
+
+Compare a more parallel run:
+
+```bash
+make bench-startup-local \
+  BENCH_STARTUP_SUITE=lean \
+  BENCH_STARTUP_REPEAT=25 \
+  BENCH_STARTUP_WORKERS=8 \
+  BENCH_STARTUP_REST_MS=100
+```
+
+Compare lean-default `awsgo` against the full generated service runtime without
+calling AWS APIs:
+
+```bash
+make bench-lean-vs-full-startup-local \
+  BENCH_STARTUP_REPEAT=25 \
+  BENCH_STARTUP_WORKERS=4 \
+  BENCH_STARTUP_REST_MS=100
+```
+
+The lean-vs-full startup report prints an explicit verdict:
+
+```text
+lean-vs-full verdict: same-or-better
+```
+
+Planning estimates before running the local startup suite:
+
+| Scope | Rest | Workers | Estimated runtime |
+| --- | ---: | ---: | ---: |
+| Lean pilot operation help, 25 repeats | `100ms` | 4 | under 5 minutes |
+| Lean pilot operation help, 25 repeats | `100ms` | 8 | under 5 minutes |
+| Zero-required read-only operation help | `100ms` | 1 | 40-100 minutes |
+| Zero-required read-only operation help | `100ms` | 2 | 20-60 minutes |
+| All generated operation help | `100ms` | 1 | 4-9 hours |
+| All generated operation help | `100ms` | 4 | 1-3 hours |
+
+Planned reporting fields:
+
+| Field | Purpose |
+| --- | --- |
+| `service` / `operation` | Benchmark case identity |
+| `cli` | `aws` or `awsgo` |
+| `repeat` / `order` | Detect order bias |
+| `real` / `user` / `sys` | Wall-clock and CPU cost |
+| `exit` | Capture failures without hiding them |
+| `stdout_bytes` / `stderr_bytes` | Sanity-check comparable output paths |
+
+Measured lean local startup result:
+
+| Suite | Repeats | Workers | Rest | Commands | AWS CLI avg real | awsgo avg real | Approx speedup |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Lean operation help | 25 | 4 | `100ms` | 200 | 0.400s | 0.029s | 13.93x |
+| Lean operation help | 25 | 8 | `100ms` | 200 | 0.456s | 0.022s | 21.00x |
+
+Measured lean-vs-full local startup result:
+
+| Suite | Repeats | Workers | Rest | Commands | Full avg real | Lean avg real | Full median | Lean median | Verdict |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Lean operation help | 25 | 4 | `100ms` | 200 | 0.029s | 0.029s | 0.029s | 0.027s | same-or-better |
+
+The local startup test does not call AWS APIs. It only invokes help/parse paths
+for the lean pilot operations and measures process startup, CLI initialization,
+argument parsing, help rendering, and shutdown. The result is intentionally not
+a live API benchmark; it isolates the AWS CLI Python startup/runtime cost that
+can be hidden by network latency in real AWS calls.
+
 ### Preliminary Local Result
 
 On a local development machine, three read-only operations were each repeated
-five times against the same AWS profile and region:
+five times against the same AWS profile and region.
+
+Current split architecture, using the full generated service runtime:
 
 | Case | AWS CLI avg real | awsgo avg real | Approx speedup |
 | --- | ---: | ---: | ---: |
-| `sts get-caller-identity` | 0.682s | 0.442s | 1.54x |
-| `ec2 describe-instances` | 0.778s | 0.524s | 1.48x |
-| `s3api/s3 list-buckets` | 0.666s | 0.430s | 1.55x |
+| `sts get-caller-identity` | 0.632s | 0.360s | 1.76x |
+| `ec2 describe-instances` | 0.788s | 0.406s | 1.94x |
+| `s3api/s3 list-buckets` | 0.656s | 0.606s | 1.08x |
 
-Across that small sample, AWS CLI averaged 0.709s real time while `awsgo`
-averaged 0.465s, roughly a 1.52x wall-clock improvement. The bigger local
-difference was CPU time: AWS CLI averaged 0.234s user CPU per command, while
-`awsgo` averaged 0.010s. That supports the expected thesis: for short-lived AWS
-read calls, a native Go CLI avoids much of the Python process/runtime overhead,
-even when the network call itself is still the dominant cost.
+Lean runtime pilot, using direct SDK invocation:
+
+| Case | AWS CLI avg real | awsgo avg real | Approx speedup |
+| --- | ---: | ---: | ---: |
+| `sts get-caller-identity` | 0.600s | 0.452s | 1.33x |
+| `ec2 describe-instances` | 0.748s | 0.432s | 1.73x |
+| `s3api/s3 list-buckets` | 0.700s | 0.370s | 1.89x |
+
+These are early numbers, not a universal guarantee. The defensible claim is
+that `awsgo` avoids most of the Python AWS CLI startup/runtime overhead. The
+working performance thesis is that a generated lean path should beat the Python
+AWS CLI for most short-lived AWS commands, especially where startup/runtime
+overhead is a meaningful share of total latency. Calls dominated by AWS service
+latency or network latency will show smaller wall-clock gains.
+
+The CPU difference is more dramatic. In the same benchmark runs, AWS CLI used
+roughly 0.20s-0.28s user CPU per command, while `awsgo` and the lean pilot
+typically used about 0.00s-0.01s. That supports the thesis that a native Go CLI
+is much lighter for short-lived AWS commands, even when total runtime is still
+bounded by AWS service latency.
+
+The lean pilot also demonstrates the binary-size opportunity:
+
+| Service | Current split service binary | Lean service binary |
+| --- | ---: | ---: |
+| `sts` | 17M | 8.7M |
+| `ec2` | 39M | 9.1M |
+| `s3` | 17M | 9.8M |
+
+The next step is to generate lean service binaries from SDK metadata instead of
+hand-wiring selected operations.
 
 ## Known Gaps
 

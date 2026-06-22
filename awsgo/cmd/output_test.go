@@ -58,3 +58,67 @@ func TestWriteOutputNormalizesNilSlices(t *testing.T) {
 		t.Fatalf("expected nil slice to render as empty array, got %q", got)
 	}
 }
+
+func TestFormatOutputNormalizesIAMListRolesLikeAWSCLI(t *testing.T) {
+	raw := []byte(`{
+		"IsTruncated": true,
+		"Marker": "TOKEN",
+		"ResultMetadata": {},
+		"Roles": [
+			{
+				"Arn": "arn:aws:iam::123456789012:role/Administrator",
+				"AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
+				"CreateDate": "2017-03-28T20:33:52Z",
+				"Description": null,
+				"Path": "/",
+				"RoleName": "Administrator",
+				"Tags": []
+			}
+		]
+	}`)
+	out, err := formatOutput(raw, "json")
+	if err != nil {
+		t.Fatalf("formatOutput returned error: %v", err)
+	}
+	got := string(out)
+	for _, unwanted := range []string{
+		"ResultMetadata",
+		"IsTruncated",
+		`"Marker"`,
+		`"Description"`,
+		`"Tags"`,
+		`%7B%22Version%22`,
+	} {
+		if strings.Contains(got, unwanted) {
+			t.Fatalf("output still contains %q:\n%s", unwanted, got)
+		}
+	}
+	for _, want := range []string{
+		`"NextToken": "TOKEN"`,
+		`"AssumeRolePolicyDocument": {`,
+		`"Version": "2012-10-17"`,
+		`"CreateDate": "2017-03-28T20:33:52+00:00"`,
+	} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("output missing %q:\n%s", want, got)
+		}
+	}
+}
+
+func TestFormatOutputMergesPaginatorPages(t *testing.T) {
+	raw := []byte(`[
+		{"ResultMetadata":{},"Roles":[{"RoleName":"one"}]},
+		{"ResultMetadata":{},"Roles":[{"RoleName":"two"}]}
+	]`)
+	out, err := formatOutput(raw, "json")
+	if err != nil {
+		t.Fatalf("formatOutput returned error: %v", err)
+	}
+	got := string(out)
+	if !strings.Contains(got, `"RoleName": "one"`) || !strings.Contains(got, `"RoleName": "two"`) {
+		t.Fatalf("expected merged paginator page roles, got:\n%s", got)
+	}
+	if strings.Contains(got, "ResultMetadata") {
+		t.Fatalf("expected ResultMetadata to be removed, got:\n%s", got)
+	}
+}

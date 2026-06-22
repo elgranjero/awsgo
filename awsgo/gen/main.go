@@ -20,6 +20,8 @@ type serviceMeta struct {
 	Name                   string
 	CmdVar                 string
 	Operations             []string
+	OperationMethods       map[string]string
+	OperationHasPaginator  map[string]bool
 	OperationInputs        map[string][]string
 	OperationInputTypes    map[string]map[string]string
 	OperationInputRequired map[string][]string
@@ -27,9 +29,11 @@ type serviceMeta struct {
 
 type sdkOpMeta struct {
 	Name         string
+	GoName       string
 	InputFields  []string
 	InputTypes   map[string]string
 	RequiredOnly []string
+	HasPaginator bool
 }
 
 var (
@@ -127,6 +131,8 @@ func discoverServices(root string) ([]serviceMeta, error) {
 		sort.Strings(rawOps)
 
 		opInputs := map[string][]string{}
+		opMethods := map[string]string{}
+		opHasPaginator := map[string]bool{}
 		opInputTypes := map[string]map[string]string{}
 		opInputRequired := map[string][]string{}
 		ops := []string{}
@@ -143,6 +149,8 @@ func discoverServices(root string) ([]serviceMeta, error) {
 					continue
 				}
 				ops = append(ops, meta.Name)
+				opMethods[meta.Name] = meta.GoName
+				opHasPaginator[meta.Name] = meta.HasPaginator
 				opInputs[meta.Name] = meta.InputFields
 				opInputTypes[meta.Name] = meta.InputTypes
 				opInputRequired[meta.Name] = meta.RequiredOnly
@@ -153,6 +161,9 @@ func discoverServices(root string) ([]serviceMeta, error) {
 		if len(ops) == 0 {
 			ops = append(ops, rawOps...)
 			sort.Strings(ops)
+			for _, op := range ops {
+				opMethods[op] = pascalFromOperation(op)
+			}
 
 			rawInputs := extractOperationInputs(string(content), rawOps)
 			for raw, fields := range rawInputs {
@@ -172,6 +183,8 @@ func discoverServices(root string) ([]serviceMeta, error) {
 			Name:                   name,
 			CmdVar:                 cmdVar,
 			Operations:             ops,
+			OperationMethods:       opMethods,
+			OperationHasPaginator:  opHasPaginator,
 			OperationInputs:        opInputs,
 			OperationInputTypes:    opInputTypes,
 			OperationInputRequired: opInputRequired,
@@ -218,6 +231,17 @@ func loadSDKOperations(serviceRoot, service string) []sdkOpMeta {
 		if err != nil {
 			continue
 		}
+		hasPaginator := false
+		for _, decl := range parsed.Decls {
+			fn, ok := decl.(*ast.FuncDecl)
+			if !ok || fn.Name == nil {
+				continue
+			}
+			if fn.Name.Name == "New"+opPascal+"Paginator" {
+				hasPaginator = true
+				break
+			}
+		}
 
 		fields := []string{}
 		required := []string{}
@@ -259,9 +283,11 @@ func loadSDKOperations(serviceRoot, service string) []sdkOpMeta {
 		sort.Strings(required)
 		out = append(out, sdkOpMeta{
 			Name:         kebabFromPascal(opPascal),
+			GoName:       opPascal,
 			InputFields:  fields,
 			InputTypes:   fieldTypes,
 			RequiredOnly: required,
+			HasPaginator: hasPaginator,
 		})
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
@@ -293,6 +319,9 @@ func splitIdentifierWords(s string) []string {
 	}
 	s = strings.ReplaceAll(s, "QnA", "QNA")
 	s = strings.ReplaceAll(s, "QuickSight", "Quicksight")
+	s = strings.ReplaceAll(s, "CRC32C", "CRC32-C")
+	s = strings.ReplaceAll(s, "CRC64NVMe", "CRC64-NVME")
+	s = strings.ReplaceAll(s, "CRC64NVME", "CRC64-NVME")
 	s = strings.ReplaceAll(s, "DDoS", "DDOS")
 	s = strings.ReplaceAll(s, "DoS", "DOS")
 	s = strings.ReplaceAll(s, "NVMe", "NVME")
@@ -794,6 +823,24 @@ func writeSplitEntrypoints(root, modulePath string, services []serviceMeta) erro
 			return err
 		}
 	}
+
+	leanDispatcherDir := filepath.Join(root, "awsgo", "lean-dispatcher")
+	if err := os.MkdirAll(leanDispatcherDir, 0o755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(leanDispatcherDir, "main.go"), renderLeanDispatcherMain(services), 0o644); err != nil {
+		return err
+	}
+	for _, svc := range services {
+		serviceDir := filepath.Join(root, "awsgo", "lean-services", svc.Name)
+		if err := os.MkdirAll(serviceDir, 0o755); err != nil {
+			return err
+		}
+		src := renderLeanServiceMain(modulePath, svc)
+		if err := os.WriteFile(filepath.Join(serviceDir, "main.go"), src, 0o644); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -885,6 +932,194 @@ func renderServiceMain(modulePath string, svc serviceMeta) []byte {
 	return gofmtBytes(b.Bytes())
 }
 
+func renderLeanServiceMain(modulePath string, svc serviceMeta) []byte {
+	var b bytes.Buffer
+	b.WriteString("package main\n\n")
+	b.WriteString("import (\n")
+	b.WriteString("\t\"context\"\n")
+	b.WriteString("\t\"fmt\"\n")
+	b.WriteString("\t\"os\"\n\n")
+	fmt.Fprintf(&b, "\t%q\n", modulePath+"/awsgo/leanruntime")
+	b.WriteString("\t\"github.com/aws/aws-sdk-go-v2/aws\"\n")
+	fmt.Fprintf(&b, "\tsvc %q\n", "github.com/aws/aws-sdk-go-v2/service/"+svc.Name)
+	b.WriteString(")\n\n")
+
+	opNames := append([]string(nil), svc.Operations...)
+	sort.Strings(opNames)
+	for _, op := range opNames {
+		fieldVar := leanFieldsIdent(op)
+		fmt.Fprintf(&b, "var %s = []leanruntime.Field{\n", fieldVar)
+		fields := append([]string(nil), svc.OperationInputs[op]...)
+		sort.Strings(fields)
+		required := map[string]bool{}
+		for _, f := range svc.OperationInputRequired[op] {
+			required[f] = true
+		}
+		typeMap := svc.OperationInputTypes[op]
+		for _, field := range fields {
+			typ := "string"
+			if typeMap != nil {
+				if v := strings.TrimSpace(typeMap[field]); v != "" {
+					typ = v
+				}
+			}
+			fmt.Fprintf(&b, "\t{Name: %q, Flag: %q, Type: %q, Required: %t},\n", field, kebabFromPascal(field), typ, required[field])
+		}
+		b.WriteString("}\n\n")
+	}
+
+	b.WriteString("func main() {\n")
+	b.WriteString("\tops := map[string]leanruntime.Operation{\n")
+	for _, op := range opNames {
+		method := svc.OperationMethods[op]
+		if method == "" {
+			method = pascalFromOperation(op)
+		}
+		fieldVar := leanFieldsIdent(op)
+		fmt.Fprintf(&b, "\t\t%q: {\n", op)
+		fmt.Fprintf(&b, "\t\t\tName: %q,\n", op)
+		fmt.Fprintf(&b, "\t\t\tFields: %s,\n", fieldVar)
+		b.WriteString("\t\t\tRun: func(ctx context.Context, cfg aws.Config, values leanruntime.Values) (any, error) {\n")
+		fmt.Fprintf(&b, "\t\t\t\tinput := &svc.%sInput{}\n", method)
+		if svc.OperationHasPaginator[op] {
+			fmt.Fprintf(&b, "\t\t\t\tdisablePaginator, err := leanruntime.ApplyInput(input, %s, values)\n", fieldVar)
+			b.WriteString("\t\t\t\tif err != nil {\n")
+			b.WriteString("\t\t\t\t\treturn nil, err\n")
+			b.WriteString("\t\t\t\t}\n")
+			b.WriteString("\t\t\t\tclient := svc.NewFromConfig(cfg)\n")
+			b.WriteString("\t\t\t\tif disablePaginator || leanruntime.PaginatorDisabled() {\n")
+			fmt.Fprintf(&b, "\t\t\t\t\treturn client.%s(ctx, input)\n", method)
+			b.WriteString("\t\t\t\t}\n")
+			fmt.Fprintf(&b, "\t\t\t\tvar results []*svc.%sOutput\n", method)
+			fmt.Fprintf(&b, "\t\t\t\tp := svc.New%sPaginator(client, input)\n", method)
+			b.WriteString("\t\t\t\tfor p.HasMorePages() {\n")
+			b.WriteString("\t\t\t\t\tresp, err := p.NextPage(ctx)\n")
+			b.WriteString("\t\t\t\t\tif err != nil {\n")
+			b.WriteString("\t\t\t\t\t\treturn nil, err\n")
+			b.WriteString("\t\t\t\t\t}\n")
+			b.WriteString("\t\t\t\t\tresults = append(results, resp)\n")
+			b.WriteString("\t\t\t\t}\n")
+			b.WriteString("\t\t\t\treturn results, nil\n")
+		} else {
+			fmt.Fprintf(&b, "\t\t\t\tif _, err := leanruntime.ApplyInput(input, %s, values); err != nil {\n", fieldVar)
+			b.WriteString("\t\t\t\t\treturn nil, err\n")
+			b.WriteString("\t\t\t\t}\n")
+			b.WriteString("\t\t\t\tclient := svc.NewFromConfig(cfg)\n")
+			fmt.Fprintf(&b, "\t\t\t\treturn client.%s(ctx, input)\n", method)
+		}
+		b.WriteString("\t\t\t},\n")
+		b.WriteString("\t\t},\n")
+	}
+	b.WriteString("\t}\n")
+	fmt.Fprintf(&b, "\tif err := leanruntime.Execute(%q, ops, os.Args[1:]); err != nil {\n", svc.Name)
+	b.WriteString("\t\tfmt.Fprintln(os.Stderr, err)\n")
+	b.WriteString("\t\tos.Exit(1)\n")
+	b.WriteString("\t}\n")
+	b.WriteString("}\n")
+	return gofmtBytes(b.Bytes())
+}
+
+func leanFieldsIdent(op string) string {
+	return "fields_" + identName(strings.ReplaceAll(op, "-", "_"))
+}
+
+func renderLeanDispatcherMain(services []serviceMeta) []byte {
+	var b bytes.Buffer
+	b.WriteString("package main\n\n")
+	b.WriteString("import (\n")
+	b.WriteString("\t\"fmt\"\n")
+	b.WriteString("\t\"os\"\n")
+	b.WriteString("\t\"os/exec\"\n")
+	b.WriteString("\t\"path/filepath\"\n")
+	b.WriteString("\t\"runtime\"\n")
+	b.WriteString("\t\"sort\"\n")
+	b.WriteString("\t\"strings\"\n")
+	b.WriteString(")\n\n")
+	b.WriteString("var services = map[string]bool{\n")
+	for _, svc := range services {
+		fmt.Fprintf(&b, "\t%q: true,\n", svc.Name)
+	}
+	b.WriteString("}\n\n")
+	b.WriteString(`func main() {
+	if len(os.Args) < 2 || os.Args[1] == "--help" || os.Args[1] == "-h" || os.Args[1] == "help" {
+		printHelp()
+		return
+	}
+	service := os.Args[1]
+	if !services[service] {
+		fmt.Fprintf(os.Stderr, "unknown lean service %q\n", service)
+		os.Exit(1)
+	}
+	bin, err := findServiceBinary(service)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	cmd := exec.Command(bin, os.Args[1:]...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Env = os.Environ()
+	if err := cmd.Run(); err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			os.Exit(exitErr.ExitCode())
+		}
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func printHelp() {
+	fmt.Println("Lean AWS-style CLI")
+	fmt.Println()
+	fmt.Println("Usage:")
+	fmt.Println("  awsgo-lean <service> <operation> [flags]")
+	fmt.Println()
+	fmt.Println("Available Services:")
+	names := make([]string, 0, len(services))
+	for name := range services {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		fmt.Printf("  %s\n", name)
+	}
+}
+
+func findServiceBinary(service string) (string, error) {
+	name := "awsgo-lean-" + service
+	if runtime.GOOS == "windows" {
+		name += ".exe"
+	}
+	if dir := strings.TrimSpace(os.Getenv("AWSGO_LEAN_SERVICE_DIR")); dir != "" {
+		if p := filepath.Join(dir, name); fileExists(p) {
+			return p, nil
+		}
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+	dir := filepath.Dir(exe)
+	for _, p := range []string{
+		filepath.Join(dir, "awsgo-lean-services", name),
+		filepath.Join(dir, name),
+	} {
+		if fileExists(p) {
+			return p, nil
+		}
+	}
+	return "", fmt.Errorf("lean service binary for %q not found", service)
+}
+
+func fileExists(path string) bool {
+	st, err := os.Stat(path)
+	return err == nil && !st.IsDir()
+}
+`)
+	return gofmtBytes(b.Bytes())
+}
+
 func renderDispatcherMain(services []serviceMeta) []byte {
 	var b bytes.Buffer
 	b.WriteString("package main\n\n")
@@ -894,6 +1129,7 @@ func renderDispatcherMain(services []serviceMeta) []byte {
 	b.WriteString("\t\"os/exec\"\n")
 	b.WriteString("\t\"path/filepath\"\n")
 	b.WriteString("\t\"runtime\"\n")
+	b.WriteString("\t\"sort\"\n")
 	b.WriteString("\t\"strings\"\n")
 	b.WriteString(")\n\n")
 
@@ -904,6 +1140,16 @@ func renderDispatcherMain(services []serviceMeta) []byte {
 	b.WriteString("}\n\n")
 
 	b.WriteString("var serviceOps = map[string]map[string]bool{\n")
+	for _, svc := range services {
+		fmt.Fprintf(&b, "\t%q: {", svc.Name)
+		for _, op := range svc.Operations {
+			fmt.Fprintf(&b, "%q: true, ", op)
+		}
+		b.WriteString("},\n")
+	}
+	b.WriteString("}\n\n")
+
+	b.WriteString("var leanServiceOps = map[string]map[string]bool{\n")
 	for _, svc := range services {
 		fmt.Fprintf(&b, "\t%q: {", svc.Name)
 		for _, op := range svc.Operations {
@@ -931,6 +1177,14 @@ func renderDispatcherMain(services []serviceMeta) []byte {
 		os.Exit(127)
 	}
 
+	if shouldUseLean(args) {
+		bin, err := findLeanServiceBinary(service)
+		if err == nil {
+			runCommand(bin, args)
+			return
+		}
+	}
+
 	forwarded := args[1:]
 	if len(forwarded) > 0 {
 		if _, ok := ops[forwarded[0]]; ok {
@@ -944,7 +1198,11 @@ func renderDispatcherMain(services []serviceMeta) []byte {
 		os.Exit(127)
 	}
 
-	cmd := exec.Command(bin, forwarded...)
+	runCommand(bin, forwarded)
+}
+
+func runCommand(bin string, args []string) {
+	cmd := exec.Command(bin, args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -956,6 +1214,126 @@ func renderDispatcherMain(services []serviceMeta) []byte {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func shouldUseLean(args []string) bool {
+	if leanDisabled() {
+		return false
+	}
+	service, operation, ok := leanCandidateOperation(args)
+	if !ok {
+		return false
+	}
+	ops, ok := leanServiceOps[service]
+	return ok && ops[operation]
+}
+
+func leanDisabled() bool {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv("AWSGO_DISABLE_LEAN"))) {
+	case "1", "true", "yes", "on":
+		return true
+	default:
+		return false
+	}
+}
+
+func leanCandidateOperation(args []string) (string, string, bool) {
+	if len(args) < 2 {
+		return "", "", false
+	}
+	service := args[0]
+	tail := args[1:]
+	for i := 0; i < len(tail); i++ {
+		arg := tail[i]
+		if arg == "help" {
+			if i+1 < len(tail) {
+				return service, tail[i+1], true
+			}
+			return "", "", false
+		}
+		if strings.HasPrefix(arg, "--") {
+			name, _, hasValue := strings.Cut(strings.TrimPrefix(arg, "--"), "=")
+			if name == "help" {
+				return "", "", false
+			}
+			if !hasValue && flagConsumesNextArg(name) && i+1 < len(tail) {
+				i++
+			}
+			continue
+		}
+		if strings.HasPrefix(arg, "-") {
+			if arg == "-h" {
+				return "", "", false
+			}
+			if arg == "-o" && i+1 < len(tail) {
+				i++
+			}
+			continue
+		}
+		return service, arg, true
+	}
+	return "", "", false
+}
+
+func flagConsumesNextArg(name string) bool {
+	switch name {
+	case "profile", "region", "output", "query", "input-json", "cli-input-json", "input-file":
+		return true
+	default:
+		return false
+	}
+}
+
+func sharedConfigProfileOutput(profile string) string {
+	profile = strings.TrimSpace(profile)
+	if profile == "" {
+		profile = strings.TrimSpace(os.Getenv("AWS_PROFILE"))
+	}
+	if profile == "" {
+		profile = "default"
+	}
+
+	sectionName := "default"
+	if profile != "default" {
+		sectionName = "profile " + profile
+	}
+
+	configPath := strings.TrimSpace(os.Getenv("AWS_CONFIG_FILE"))
+	if configPath == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return ""
+		}
+		configPath = filepath.Join(home, ".aws", "config")
+	}
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return ""
+	}
+
+	currentSection := ""
+	for _, rawLine := range strings.Split(string(data), "\n") {
+		line := strings.TrimSpace(rawLine)
+		if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, ";") {
+			continue
+		}
+		if strings.HasPrefix(line, "[") {
+			if end := strings.Index(line, "]"); end >= 0 {
+				currentSection = strings.TrimSpace(line[1:end])
+			}
+			continue
+		}
+		if currentSection != sectionName {
+			continue
+		}
+		key, value, ok := strings.Cut(line, "=")
+		if !ok || strings.TrimSpace(key) != "output" {
+			continue
+		}
+		return strings.Trim(strings.TrimSpace(value), "\"'")
+	}
+	return ""
 }
 
 func printRootHelp() {
@@ -976,7 +1354,7 @@ func printRootHelp() {
 }
 
 func serviceEnabled(service string) bool {
-	if names, ok := manifestServices(); ok {
+	if names, ok := builtManifestServices(); ok {
 		for _, name := range names {
 			if name == service {
 				return true
@@ -984,31 +1362,41 @@ func serviceEnabled(service string) bool {
 		}
 		return false
 	}
-	_, err := findServiceBinary(service)
+	if _, err := findServiceBinary(service); err == nil {
+		return true
+	}
+	_, err := findLeanServiceBinary(service)
 	return err == nil
 }
 
 func enabledServiceNames() []string {
-	if names, ok := manifestServices(); ok {
+	if names, ok := builtManifestServices(); ok {
 		return names
 	}
 	names := make([]string, 0, len(serviceNames))
 	for _, name := range serviceNames {
 		if _, err := findServiceBinary(name); err == nil {
 			names = append(names, name)
+			continue
+		}
+		if _, err := findLeanServiceBinary(name); err == nil {
+			names = append(names, name)
 		}
 	}
 	return names
 }
 
-func manifestServices() ([]string, bool) {
-	for _, path := range serviceManifestPaths() {
+func builtManifestServices() ([]string, bool) {
+	paths := append(serviceManifestPaths(), leanServiceManifestPaths()...)
+	out := make([]string, 0)
+	seen := map[string]bool{}
+	found := false
+	for _, path := range paths {
 		data, err := os.ReadFile(path)
 		if err != nil {
 			continue
 		}
-		out := make([]string, 0)
-		seen := map[string]bool{}
+		found = true
 		for _, raw := range strings.Split(string(data), "\n") {
 			name := strings.TrimSpace(raw)
 			if name == "" || strings.HasPrefix(name, "#") {
@@ -1020,9 +1408,12 @@ func manifestServices() ([]string, bool) {
 			seen[name] = true
 			out = append(out, name)
 		}
-		return out, true
 	}
-	return nil, false
+	if !found {
+		return nil, false
+	}
+	sort.Strings(out)
+	return out, true
 }
 
 func serviceManifestPaths() []string {
@@ -1038,6 +1429,21 @@ func serviceManifestPaths() []string {
 	return append(paths,
 		filepath.Join(dir, "awsgo-services", "manifest.txt"),
 		filepath.Join(dir, "manifest.txt"),
+	)
+}
+
+func leanServiceManifestPaths() []string {
+	paths := []string{}
+	if dir := os.Getenv("AWSGO_LEAN_SERVICE_DIR"); dir != "" {
+		paths = append(paths, filepath.Join(dir, "manifest.txt"))
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return paths
+	}
+	dir := filepath.Dir(exe)
+	return append(paths,
+		filepath.Join(dir, "awsgo-lean-services", "manifest.txt"),
 	)
 }
 
@@ -1065,6 +1471,32 @@ func findServiceBinary(service string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("service binary for %q not found; install %s under awsgo-services/ or set AWSGO_SERVICE_DIR", service, name)
+}
+
+func findLeanServiceBinary(service string) (string, error) {
+	name := "awsgo-lean-" + service
+	if runtime.GOOS == "windows" {
+		name += ".exe"
+	}
+	if dir := strings.TrimSpace(os.Getenv("AWSGO_LEAN_SERVICE_DIR")); dir != "" {
+		if p := filepath.Join(dir, name); fileExists(p) {
+			return p, nil
+		}
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+	dir := filepath.Dir(exe)
+	for _, p := range []string{
+		filepath.Join(dir, "awsgo-lean-services", name),
+		filepath.Join(dir, name),
+	} {
+		if fileExists(p) {
+			return p, nil
+		}
+	}
+	return "", fmt.Errorf("lean service binary for %q not found", service)
 }
 
 func fileExists(path string) bool {
